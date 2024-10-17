@@ -45,7 +45,8 @@ const RiskFundedPage = () => {
     router.prefetch("/");
   }, []);
 
-  const hideStep6 = riskParticipationTransaction === "LC Confirmation";
+  // const hideStep6 = riskParticipationTransaction === "LC Confirmation";
+  const hideStep6 = true;
 
   const formData = useRiskStore((state) => state);
   const setFormData = useRiskStore((state) => state.setValues);

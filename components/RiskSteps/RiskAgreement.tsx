@@ -33,11 +33,10 @@ export const RiskAgreement = () => {
   };
   return (
     <div className="bg-white rounded-lg border border-borderCol py-4 px-4">
-      <div className="flex items-center justify-between gap-x-2 w-full">
+      <div className="gap-x-2 w-full">
         <p className="text-lightGray font-semibold text-[16px] ml-2">
           BAFT Agreement
         </p>
-        <ChevronDown className="text-[#92929D] cursor-pointer mr-4" />
       </div>
       <p className="font-semibold mt-3 ml-2 text-[14px]">
         Download BAFT agreement and upload a signed copy

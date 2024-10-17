@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { BankRadioInput, DateInput, DiscountBanks } from "./RiskHelpers";
-import { DDInput } from "../LCSteps/helpers";
+import { BgRadioInput, DDInput } from "../LCSteps/helpers";
 import { getAllPortData, getPorts } from "@/services/apis/helpers.api";
 import { useQuery } from "@tanstack/react-query";
 import Period from "../RiskParticipation/Period";
@@ -24,6 +24,10 @@ export const RiskStep3 = ({
 }: Props) => {
   const [portCountries, setPortCountries] = useState<string[]>([]);
   const [ports, setPorts] = useState<string[]>([]);
+  let paymentTerms = watch("paymentTerms");
+  let extraInfo = watch("extraInfo") || { days: 0, other: "" };
+  const [isOthersSelected, setIsOthersSelected] = useState(false);
+  const [otherValue, setOtherValue] = useState("");
   const riskParticipationTransaction = watch(
     "riskParticipationTransaction.type"
   );
@@ -100,162 +104,191 @@ export const RiskStep3 = ({
         setValue={setValue}
         watch={watch}
       />
-      {riskParticipationTransaction !== "LC Confirmation" && (
-        <div className="relative flex items-center justify-between gap-x-3 w-full my-4">
-          <div className="border border-borderCol py-3 px-2 rounded-md w-full bg-[#F5F7F9] h-[274px]">
-            <p className="text-sm font-semibold mb-2 ml-2">
-              Is the LC Discounted?
-            </p>
-            <BankRadioInput
-              id="discounted-yes"
-              label="Yes"
-              name="isLcDiscounting"
-              value="yes"
-              checked={watch("isLcDiscounting") === "yes"}
-              register={register}
-            />
-            <BankRadioInput
-              id="discounted-no"
-              label="No"
-              name="isLcDiscounting"
-              value="no"
-              checked={watch("isLcDiscounting") === "no"}
-              register={register}
-            />
-          </div>
 
-          <div className="border border-borderCol py-3 px-2 rounded-md w-full bg-[#F5F7F9]">
-            <p className="text-sm font-semibold mb-2 ml-2">
-              Is it expected to be discounted?
-            </p>
-            <BankRadioInput
-              id="expected-yes"
-              label="Yes"
-              name="expectedDiscounting"
-              value="yes"
-              checked={watch("expectedDiscounting") === "yes"}
-              register={register}
-            />
-            <BankRadioInput
-              id="expected-no"
-              label="No"
-              name="expectedDiscounting"
-              value="no"
-              checked={watch("expectedDiscounting") === "no"}
-              register={register}
-            />
-
-            <DateInput
-              name="expectedDateDiscounting"
-              value={expectedDateDiscounting}
-              setValue={setValue}
-              title="Expected Date of Discounting"
-              noBorder
-            />
-          </div>
-        </div>
-      )}
+      <Period setValue={setValue} watch={watch} />
+      <DateInput
+        name="expiryDate"
+        value={expiryDate}
+        setValue={setValue}
+        title="LC Expiry Date"
+      />
 
       <div className="flex items-center justify-between gap-x-3 w-full my-4">
-        <Period setValue={setValue} watch={watch} />
-
-        <DateInput
-          name="expiryDate"
-          value={expiryDate}
-          setValue={setValue}
-          title="LC Expiry Date"
-        />
-      </div>
-
-      <div className="flex items-center justify-between gap-x-3 w-full my-4">
-        <div className="border border-borderCol pt-3 pb-1 px-2 rounded-md w-full bg-[#F5F7F9]">
-          <p className="text-sm font-semibold mb-2 ml-2">Payment Terms</p>
-          <div className="flex items-center gap-x-3 w-full justify-between">
-            <BankRadioInput
+        <div className="rounded-md border border-borderCol bg-[#F5F7F9] px-2 py-3 w-full">
+          <h5 className="ml-3 text-sm font-semibold">Payment Terms</h5>
+          <div className="mt-2 flex w-full flex-wrap items-center gap-x-3 xl:flex-nowrap">
+            <BgRadioInput
               id="payment-sight"
               label="Sight LC"
               name="paymentTerms"
-              value="sight"
-              checked={watch("paymentTerms") === "sight"}
+              value="Sight LC"
               register={register}
+              checked={paymentTerms === "Sight LC"}
             />
-            <BankRadioInput
+            <BgRadioInput
               id="payment-usance"
               label="Usance LC"
               name="paymentTerms"
-              value="usance"
-              checked={watch("paymentTerms") === "usance"}
+              value="Usance LC"
               register={register}
+              checked={paymentTerms === "Usance LC"}
             />
-            {watch("paymentTerms") === "usance" ||
-            watch("paymentTerms") === "Tenor LC" ? (
-              <div className="w-full">
-                <label
-                  htmlFor="payment-tenor"
-                  className={`px-3 py-2.5 w-full transition-colors duration-100 ${
-                    watch("paymentTerms") === "Tenor LC"
-                      ? "bg-[#DCE5FD]"
-                      : "border border-borderCol bg-white"
-                  } rounded-md flex items-center justify-between gap-x-3 mb-2 text-lightGray text-sm`}
-                >
-                  <div className="flex gap-x-2 items-center">
-                    <input
-                      type="radio"
-                      id="payment-tenor"
-                      value="Tenor LC"
-                      checked={watch("paymentTerms") === "Tenor LC"}
-                      {...register("paymentTerms")}
-                      className="accent-[#255EF2] size-4"
-                    />
-                    Tenor LC
-                  </div>
-                  <div className="border-b border-black flex items-center">
-                    <input
-                      placeholder="enter days"
-                      inputMode="numeric"
-                      // disabled={watch("paymentTerms") !== "Tenor LC"}
-                      type="text"
-                      value={dayss}
-                      max={100}
-                      // {...register("days")}
-                      onChange={(e) => setDays(Number(e.target.value))}
-                      className="text-sm text-lightGray border-none max-w-[150px] bg-transparent outline-none"
-                    />
-                    <div className="flex items-center gap-x-1">
-                      <button
-                        // disabled={watch("paymentTerms") !== "Tenor LC"}
-                        type="button"
-                        className="rounded-sm border border-para size-6 center mb-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDays((prev: any) =>
-                            prev >= 1 ? Number(prev) + 1 : 1
-                          );
-                        }}
-                      >
-                        +
-                      </button>
-                      <button
-                        // disabled={watch("paymentTerms") !== "Tenor LC"}
-                        type="button"
-                        className="rounded-sm border border-para size-6 center mb-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log("onclicked");
-                          console.log(days);
-                          setDays((prev: any) =>
-                            prev > 1 ? Number(prev) - 1 : 1
-                          );
-                        }}
-                      >
-                        -
-                      </button>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            ) : null}
+            <BgRadioInput
+              id="payment-deferred"
+              label="Deferred LC"
+              name="paymentTerms"
+              value="Deferred LC"
+              register={register}
+              checked={paymentTerms === "Deferred LC"}
+            />
+            <BgRadioInput
+              id="payment-upas"
+              label="UPAS LC (Usance payment at sight)"
+              name="paymentTerms"
+              value="UPAS LC"
+              register={register}
+              checked={paymentTerms === "UPAS LC"}
+            />
           </div>
+          {/* Days input */}
+          {paymentTerms && paymentTerms !== "Sight LC" && (
+            <>
+              <div className="my-3 ml-2 flex items-center gap-x-2">
+                <div className="flex items-center border-b-2 border-black">
+                  <input
+                    placeholder="enter days"
+                    inputMode="numeric"
+                    name="days"
+                    type="number"
+                    value={days === 0 ? "" : days} // Conditional rendering to display empty input when days is 0
+                    className="max-w-[150px] border-none bg-[#F5F7F9] text-sm text-lightGray outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    onChange={(e: any) => {
+                      const value = e.target.value;
+                      if (value === "" || Number(value) <= 999) {
+                        setDays(value === "" ? 0 : Number(value));
+                        setValue(
+                          "extraInfo.days",
+                          value === "" ? 0 : Number(value)
+                        );
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-x-1">
+                    <button
+                      type="button"
+                      className="center mb-2 size-6 rounded-sm border border-para"
+                      onClick={() => {
+                        if (days >= 999) return;
+                        else {
+                          const newDays = Number(days) + 1;
+                          setDays(newDays);
+                          setValue("extraInfo.days", newDays);
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      className="center mb-2 size-6 rounded-sm border border-para"
+                      onClick={() => {
+                        if (days > 1) {
+                          const newDays = Number(days) - 1;
+                          setDays(newDays);
+                          setValue("extraInfo.days", newDays);
+                        } else {
+                          setDays(0); // Reset to 0 if it's below 1
+                          setValue("extraInfo.days", 0);
+                        }
+                      }}
+                    >
+                      -
+                    </button>
+                  </div>
+                </div>
+                <p className="font-semibold">days from</p>
+              </div>
+              <div className="flex items-center justify-between gap-x-3">
+                <BgRadioInput
+                  id="payment-shipment"
+                  label="BL Date/Shipment Date"
+                  name="extraInfo.other"
+                  value="shipment date"
+                  register={register}
+                  checked={extraInfo.other === "shipment date"}
+                />
+                <BgRadioInput
+                  id="payment-acceptance"
+                  label="Acceptance Date"
+                  name="extraInfo.other"
+                  value="acceptance date"
+                  register={register}
+                  checked={extraInfo.other === "acceptance date"}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-x-3">
+                <BgRadioInput
+                  id="payment-negotiation"
+                  label="Negotiation Date"
+                  name="extraInfo.other"
+                  value="negotiation date"
+                  register={register}
+                  checked={extraInfo.other === "negotiation date"}
+                />
+                <BgRadioInput
+                  id="payment-invoice"
+                  label="Invoice Date"
+                  name="extraInfo.other"
+                  value="invoice date"
+                  register={register}
+                  checked={extraInfo.other === "invoice date"}
+                />
+                <BgRadioInput
+                  id="payment-extra-sight"
+                  label="Sight"
+                  name="extraInfo.other"
+                  value="sight"
+                  register={register}
+                  checked={extraInfo.other === "sight"}
+                />
+              </div>
+              <div
+                className={`mb-2 flex w-full items-end gap-x-5 rounded-md border border-borderCol bg-white px-3 py-4 ${
+                  isOthersSelected && "!bg-[#EEE9FE]"
+                }`}
+              >
+                <label
+                  htmlFor="payment-others"
+                  className="flex items-center gap-x-2 text-sm text-lightGray"
+                >
+                  <input
+                    type="radio"
+                    value="others"
+                    id="payment-others"
+                    checked={isOthersSelected} // Control radio button with the new state
+                    onChange={() => {
+                      setIsOthersSelected(true); // Set "Others" as selected
+                      setValue("extraInfo.other", ""); // Clear the previous value in form state
+                      setOtherValue(""); // Clear the local otherValue input
+                    }}
+                    className="size-4 accent-primaryCol"
+                  />
+                  Others
+                </label>
+                <input
+                  type="text"
+                  name="othersTextInput"
+                  value={otherValue}
+                  disabled={!isOthersSelected} // Enable only when "Others" is selected
+                  onChange={(e: any) => {
+                    setOtherValue(e.target.value); // Update the local state
+                    setValue("extraInfo.other", e.target.value); // Set the typed value in form state
+                  }}
+                  className="w-[80%] rounded-none !border-b-2 border-transparent !border-b-neutral-300 bg-transparent text-sm outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
       {/* Transhipment */}
@@ -306,26 +339,15 @@ export const RiskStep3 = ({
           />
         </div>
       </div>
-
-      {/* Expected Date */}
-      <div className="flex items-center justify-between gap-x-3 w-full mt-4">
-        <DateInput
-          name="expectedDateConfirmation"
-          value={expectedDateConfirmation}
-          setValue={setValue}
-          title="Expected date to add confirmation"
-        />
-        {/* Product Description */}
-        <div className="border border-borderCol pt-3 pb -5 px-2 rounded-md w-full bg-[#F5F7F9]">
-          <p className="text-sm font-semibold mb-2 ml-3">Product Description</p>
-          <textarea
-            name="description"
-            rows={2}
-            {...register("description")}
-            placeholder="Enter the description of the product being imported (under this LC)"
-            className="bg-white text-sm border border-borderCol resize-none w-full py-1 px-3 rounded-lg outline-none"
-          ></textarea>
-        </div>
+      <div className="border border-borderCol pt-3 px-2 rounded-md w-full bg-[#F5F7F9] mt-3.5">
+        <p className="text-sm font-semibold mb-2 ml-3">Product Description</p>
+        <textarea
+          name="description"
+          rows={2}
+          {...register("description")}
+          placeholder="Enter the description of the product"
+          className="bg-white text-sm border h-20 border-borderCol resize-none w-full py-1 px-3 rounded-lg outline-none"
+        ></textarea>
       </div>
     </div>
   );

@@ -9,7 +9,6 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ValidatingCalendar } from "../LCSteps/Step3Helpers";
 
-// TODO: add types
 export default function Period({
   watch,
   setValue,
@@ -22,8 +21,7 @@ export default function Period({
 
   const lcPeriodType = watch("period.expectedDate");
   const lcStartDate = watch("period.startDate");
-  console.log(lcPeriodType, "lcPeriodType");
-  // Populate the initial start date if it's available
+
   useEffect(() => {
     if (lcStartDate) {
       setStartDate(new Date(lcStartDate));

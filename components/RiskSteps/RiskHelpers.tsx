@@ -32,8 +32,7 @@ export const DiscountBanks = ({
   valueSetter?: any;
   watch?: any;
 }) => {
-  const [isChecked, setIsChecked] = useState(false);
-  const { issuingBank, advisingBank, confirmingBank } = watch();
+  const { issuingBank, advisingBank } = watch();
 
   const { data: issuingBanks } = useQuery({
     queryKey: ["issuing-banks", issuingBank?.country],
@@ -46,51 +45,6 @@ export const DiscountBanks = ({
     queryFn: () => getBanks(advisingBank?.country),
     enabled: !!advisingBank?.country,
   });
-
-  const { data: confirmingBanks } = useQuery({
-    queryKey: ["confirming-banks", confirmingBank?.country],
-    queryFn: () => getBanks(confirmingBank?.country),
-    enabled: !!confirmingBank?.country,
-  });
-
-  const handleSameAsAdvisingBank = () => {
-    console.log(advisingBank, "aaa");
-    if (!advisingBank?.country || !advisingBank?.bank) {
-      toast.error("Please select advising country & bank first");
-      setIsChecked(false);
-      return;
-    }
-    if (confirmingBank?.country && confirmingBank?.bank) {
-      setValue("confirmingBank.country", undefined);
-      setValue("confirmingBank.bank", undefined);
-      setIsChecked(false);
-    } else {
-      setValue("confirmingBank.country", advisingBank.country);
-      setValue("confirmingBank.bank", advisingBank.bank);
-      setIsChecked(true);
-    }
-  };
-
-  useEffect(() => {
- 
-    if (isChecked && advisingBank?.bank && advisingBank?.country) {
-      setValue("confirmingBank.country", advisingBank.country);
-      setValue("confirmingBank.bank", advisingBank.bank);
-    }
-    console.log(isChecked,advisingBank,confirmingBank)
-  
-  }, [advisingBank?.bank, advisingBank?.country,confirmingBank?.bank,confirmingBank?.country]);
-
-  useEffect(() => {
-    if (advisingBank && confirmingBank !== undefined) {
-      if (
-        advisingBank?.country === confirmingBank?.country &&
-        advisingBank?.bank === confirmingBank?.bank
-      ) {
-        setIsChecked(true);
-      }
-    }
-  }, [advisingBank, confirmingBank]);
 
   return (
     <div className="flex items-center justify-between w-full mb-3 gap-x-4 flex-wrap xl:flex-nowrap">
@@ -152,57 +106,6 @@ export const DiscountBanks = ({
             }
             data={
               advisingBanks && advisingBanks.success && advisingBanks.response
-            }
-          />
-        </div>
-      </div>
-      {/* Confirming Bank */}
-      <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
-        <div className="flex items-center gap-x-2 justify-between mb-2 px-3 xl:px-0">
-          <p className="font-semibold text-sm text-[#1A1A26]">
-            Confirming Bank
-          </p>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="same-as-advising"
-              className="accent-primaryCol"
-              checked={isChecked}
-              onChange={handleSameAsAdvisingBank}
-            />
-            <label
-              htmlFor="same-as-advising"
-              className="ml-1  text-[12px] text-lightGray"
-            >
-              Same as advising bank
-            </label>
-          </div>
-        </div>
-        <div className="flex flex-col gap-y-2">
-          <DDInput
-            placeholder="Select a country"
-            label="Country"
-            value={confirmingBank?.country}
-            id="confirmingBank.country"
-            data={countries}
-            flags={flags}
-            setValue={setValue}
-          />
-          <DDInput
-            placeholder="Select bank"
-            label="Bank"
-            id="confirmingBank.bank"
-            value={confirmingBank?.bank}
-            setValue={setValue}
-            disabled={
-              !confirmingBanks ||
-              !confirmingBanks?.response ||
-              !confirmingBanks.success
-            }
-            data={
-              confirmingBanks &&
-              confirmingBanks.success &&
-              confirmingBanks.response
             }
           />
         </div>
@@ -285,6 +188,7 @@ export const BankRadioInput = ({
   value,
   register,
   className,
+  disabled = false,
 }: {
   id: string;
   label: string;
@@ -293,6 +197,7 @@ export const BankRadioInput = ({
   checked: boolean;
   register: any;
   className?: string;
+  disabled?: boolean;
 }) => {
   return (
     <label
@@ -305,6 +210,7 @@ export const BankRadioInput = ({
         type="radio"
         id={id}
         value={value}
+        disabled={disabled}
         {...register(name)}
         checked={checked}
         className="accent-[#255EF2] size-4"

@@ -49,14 +49,6 @@ export const RiskStep1 = ({ register, watch, setValue }: Props) => {
           checked={watch("transaction") === "Risk Participation"}
           register={register}
         />
-        {/* <BankRadioInput
-          id="outright-sales"
-          label="Outright sales"
-          name="transaction"
-          value="Outright Sales"
-          checked={watch("transaction") === "Outright Sales"}
-          register={register}
-        /> */}
 
         <label
           htmlFor="outright-sales"
@@ -73,6 +65,7 @@ export const RiskStep1 = ({ register, watch, setValue }: Props) => {
               name="transaction"
               value="Outright Sales"
               {...register("transaction")}
+              disabled={true}
               checked={watch("transaction") === "Outright Sales"}
               className="accent-[#255EF2] size-4"
             />

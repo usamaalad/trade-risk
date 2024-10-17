@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
+import { CheckBoxInput } from "@/app/register/bank/page";
 
 interface Props {
   register: any;
@@ -115,6 +116,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
           label="Funded"
           name="riskParticipation"
           value="Funded"
+          disabled={true}
           checked={watch("riskParticipation") === "Funded"}
           register={register}
         />
@@ -146,6 +148,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     label="LG (letter Of Guarantee)"
                     name="riskParticipationTransaction.type"
                     value="LG (letter Of Guarantee)"
+                    disabled={true}
                     checked={
                       watch("riskParticipationTransaction.type") ===
                       "LG (letter Of Guarantee)"
@@ -157,6 +160,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     label="SBLC"
                     name="riskParticipationTransaction.type"
                     value="SBLC"
+                    disabled={true}
                     checked={
                       watch("riskParticipationTransaction.type") === "SBLC"
                     }
@@ -167,6 +171,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     label="Avalization"
                     name="riskParticipationTransaction.type"
                     value="Avalization"
+                    disabled={true}
                     checked={
                       watch("riskParticipationTransaction.type") ===
                       "Avalization"
@@ -179,6 +184,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     label="Supply Chain Finance"
                     name="riskParticipationTransaction.type"
                     value="Supply Chain Finance"
+                    disabled={true}
                     checked={
                       watch("riskParticipationTransaction.type") ===
                       "Supply Chain Finance"
@@ -226,14 +232,10 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                 </>
               )}
             </div>
-            <div
-              className={`flex ${
-                watch("riskParticipation") === "Funded" && "flex-col"
-              } gap-2 gap-y-3 my-2`}
-            >
-              <div className="w-full">
+            <div className={`flex gap-2 gap-y-3 my-2`}>
+              <div className="w-2/3">
                 <p className="font-semibold text-sm text-lightGray mb-2 ml-2">
-                  Value of transaction
+                  LC Amount Confirmed
                 </p>
 
                 <div className="flex items-center gap-x-2">
@@ -268,48 +270,42 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
               </div>
               <div className="w-full">
                 <p className="font-semibold text-sm text-lightGray mb-2 ml-2">
-                  Pricing offered on non funded participation
+                  % participation offered
                 </p>
-                <div className="flex items-start gap-x-2 justify-between w-full">
-                  {watch("riskParticipation") === "Non-Funded" && (
-                    <div className="bg-white border rounded-sm py-3 px-3 h-[53.5px] w-[80%] flex items-center justify-between gap-x-2">
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        className="bg-transparent outline-none w-[80%] text-sm"
-                        placeholder="Enter Value"
-                        {...register("riskParticipationTransaction.baseRate")}
-                        max={100}
-                        onKeyUp={(event: any) => {
-                          if (event.target?.value > 90) {
-                            event.target.value = "90.0";
-                          }
-                        }}
-                      />
-                      <p>%</p>
-                    </div>
-                  )}
-                  <BankRadioInput
-                    id="return-per-annum"
-                    label="% per annum"
-                    name="riskParticipationTransaction.returnOffer"
-                    value="perAnnum"
-                    checked={
-                      watch("riskParticipationTransaction.returnOffer") ===
-                      "perAnnum"
-                    }
+                <div className="flex items-start justify-between w-full">
+                  <CheckBoxInput
+                    checked={true}
+                    label="Maximum 90% can be offered as per MRPA"
                     register={register}
+                    id="isSameAsIssuance" // ID for the checkbox
+                    onChange={() => console.log("something")} // Call the handler
                   />
-                  <BankRadioInput
-                    id="return-fixed"
-                    label="% (Fixed)"
-                    name="riskParticipationTransaction.returnOffer"
-                    value="fixed"
-                    checked={
-                      watch("riskParticipationTransaction.returnOffer") ===
-                      "fixed"
-                    }
-                    register={register}
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    name="amount"
+                    value={currencyValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="py-[26px] border border-borderCol focus-visible:ring-0 focus-visible:ring-offset-0  flex h-10 w-full rounded-md  bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    name="amount"
+                    value={currencyValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="py-[26px] border border-borderCol focus-visible:ring-0 focus-visible:ring-offset-0  flex h-10 w-full rounded-md  bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    name="amount"
+                    value={currencyValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="py-[26px] border border-borderCol focus-visible:ring-0 focus-visible:ring-offset-0  flex h-10 w-full rounded-md  bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   />
 
                   {watch("riskParticipation") === "Funded" && (
@@ -383,35 +379,6 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="mt-4 py-2 px-2 border border-borderCol rounded-lg w-full bg-[#F5F7F9]">
-            <div className="flex items-center justify-start gap-x-3 w-full">
-              <p className="font-semibold text-sm text-lightGray ml-2">
-                % participation offered
-              </p>
-              <div className="bg-[#E9E9F0] border rounded-sm py-3 px-3 max-w-[130px] flex items-center justify-between gap-x-2">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  className="bg-transparent outline-none w-[80%] text-sm"
-                  placeholder="Value"
-                  disabled
-                  {...register(
-                    "riskParticipationTransaction.participationRate"
-                  )}
-                  max={100}
-                  onKeyUp={(event: any) => {
-                    if (event.target?.value > 100) {
-                      event.target.value = "100.0";
-                    }
-                  }}
-                />
-                <p>%</p>
-              </div>
-              <p className="text-sm font-normal">
-                (Maximum 90% can be offered)
-              </p>
             </div>
           </div>
         </>

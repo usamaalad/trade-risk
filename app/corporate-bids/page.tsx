@@ -1,5 +1,7 @@
 "use client";
+import { useEffect } from "react";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
+import { BgRadioInput } from "@/components/LCSteps/helpers";
 import { BankTable } from "@/components/shared/BankTable";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { useAuth } from "@/context/AuthProvider";
@@ -12,6 +14,7 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import { useForm } from "react-hook-form";
 
 interface SearchParams {
   searchParams: {
@@ -24,7 +27,42 @@ interface SearchParams {
 
 const CorporateBidsPage = ({ searchParams }: SearchParams) => {
   const { page, limit, filter, search } = searchParams;
+  const mainOptions = [
+    { id: "lg", label: "Letter of Guarantee" },
+    { id: "lc", label: "Letter of Confirmation" },
+  ];
 
+  const subOptions = {
+    lg: [
+      { id: "LG 100% Cash Margin", label: "LG 100% Cash Margin" },
+      {
+        id: "LG Issuance within the country",
+        label: "LG Issuance within the country",
+      },
+      {
+        id: "LG Reissuance in another country",
+        label: "LG Reissuance in another country",
+      },
+    ],
+    lc: [
+      { id: "LC Confirmation", label: "LC Confirmation" },
+      { id: "LC Discounting", label: "LC Discounting" },
+      {
+        id: "LC Confirmation & Discounting",
+        label: "LC Confirmation & Discounting",
+      },
+    ],
+  };
+
+  const { register, watch, setValue } = useForm({
+    defaultValues: {
+      mainSelection: "lg", // Default to "Letter of Guarantee"
+      subSelection: subOptions.lg[0].id, // Default to the first sub-option of "Letter of Guarantee"
+    },
+  });
+
+  const mainSelection = watch("mainSelection");
+  const subSelection = watch("subSelection");
   const pathname = usePathname();
   const { user } = useAuth();
 
@@ -61,7 +99,16 @@ const CorporateBidsPage = ({ searchParams }: SearchParams) => {
     router.push(`${pathname}?${queryString}`, { scroll: false });
   };
 
-  console.log("CorporateBidsPage -> data", data);
+  useEffect(() => {
+    handleFilter(subSelection);
+  }, [subSelection]);
+
+  // Effect to update the sub-selection when mainSelection changes
+  useEffect(() => {
+    if (mainSelection) {
+      setValue("subSelection", subOptions[mainSelection][0].id); // Set the first sub-option dynamically
+    }
+  }, [mainSelection, setValue]);
 
   return (
     <DashboardLayout>
@@ -71,39 +118,33 @@ const CorporateBidsPage = ({ searchParams }: SearchParams) => {
 
           {/* Data Table */}
           <div className="bg-white rounded-md border border-borderCol px-4 py-4">
-            {/* Tabs */}
+            {/* Main Selection Tabs */}
             <div className="flex items-center gap-x-5 mb-2">
-              <div
-                onClick={() => handleFilter("LC Confirmation")}
-                className="relative py-3 cursor-pointer"
-              >
-                <p className="text-neutral-700 font-semibold">
-                  LC Confirmation
-                </p>
-                {(filter === "LC Confirmation" || filter === "") && (
-                  <div className="absolute bottom-0 h-0.5 w-full bg-primaryCol" />
-                )}
-              </div>
-              <div
-                onClick={() => handleFilter("LC Discounting")}
-                className="relative py-3 cursor-pointer"
-              >
-                <p className="text-neutral-700 font-semibold">LC Discounting</p>
-                {filter === "LC Discounting" && (
-                  <div className="absolute bottom-0 h-0.5 w-full bg-primaryCol" />
-                )}
-              </div>
-              <div
-                onClick={() => handleFilter("LC Confirmation & Discounting")}
-                className="relative py-3 cursor-pointer"
-              >
-                <p className="text-neutral-700 font-semibold">
-                  LC Confirmation & Discounting
-                </p>
-                {filter === "LC Confirmation & Discounting" && (
-                  <div className="absolute bottom-0 h-0.5 w-full bg-primaryCol" />
-                )}
-              </div>
+              {mainOptions.map((option) => (
+                <BgRadioInput
+                  key={option.id}
+                  id={option.id}
+                  label={option.label}
+                  name="mainSelection"
+                  value={option.id}
+                  register={register}
+                  checked={mainSelection === option.id}
+                />
+              ))}
+            </div>
+            <div className="flex items-center gap-x-5 mb-2">
+              {mainSelection &&
+                subOptions[mainSelection].map((option) => (
+                  <BgRadioInput
+                    key={option.id}
+                    id={option.id}
+                    label={option.label}
+                    name="subSelection"
+                    value={option.id}
+                    register={register}
+                    checked={subSelection === option.id}
+                  />
+                ))}
             </div>
             <BankTable
               data={data}
@@ -113,7 +154,7 @@ const CorporateBidsPage = ({ searchParams }: SearchParams) => {
             />
           </div>
         </div>
-        <div className="w-[20vw] max-w-[300p x] sticky top-10 h-[80vh]">
+        <div className="w-[20vw] max-w-[300px] sticky top-10 h-[80vh]">
           <Sidebar isBank={false} />
         </div>
       </div>

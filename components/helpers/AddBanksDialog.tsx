@@ -30,7 +30,7 @@ interface Bank {
   swiftCode: string;
 }
 
-export const AddBanksDialog = () => {
+export const AddBanksDialog = ({ setValue, watch }) => {
   const [countryVal, setCountryVal] = useState("");
   const [cityVal, setCityVal] = useState("");
   const [bankVal, setBankVal] = useState("");
@@ -45,7 +45,9 @@ export const AddBanksDialog = () => {
   const [allCountries, setAllCountries] = useState<Country[]>(bankCountries);
   const [countries, setCountries] = useState<string[]>([]);
   const [flags, setFlags] = useState<string[]>([]);
-  const [banksData, setBanksData] = useState([]);
+
+  const banksData = watch("banks", []);
+
   // Fetch countries and flags
   useEffect(() => {
     const fetchedCountries = allCountries.map(
@@ -100,7 +102,7 @@ export const AddBanksDialog = () => {
     }
   }, [citiesData]);
 
-  // Handle adding bank
+  // Handle adding bank and use setValue from react-hook-form
   const handleBankAdd = () => {
     if (!countryVal) return toast.error("Please select a country");
     if (!bankVal) return toast.error("Please select a bank");
@@ -113,29 +115,31 @@ export const AddBanksDialog = () => {
       city: cityVal,
       swiftCode: swiftCodeVal,
     };
-    setBanksData((prevBanks) => ({
-      ...prevBanks,
-      [countryVal]: [...(prevBanks[countryVal] || []), newBank],
-    }));
+    console.log(newBank, watch("banks"));
+    const updatedBanksData = {
+      ...banksData,
+      [countryVal]: [...(banksData[countryVal] || []), newBank],
+    };
+
+    // Use setValue to update the form's banks field
+    setValue("banks", updatedBanksData);
     setBankVal("");
     setSwiftCodeVal("");
   };
 
   const handleBankDelete = (country: string, index: number) => {
-    setBanksData((prevBanks) => {
-      const updatedCountryBanks = prevBanks[country].filter(
-        (_, i) => i !== index
-      );
-      if (updatedCountryBanks.length === 0) {
-        const { [country]: _, ...restOfCountries } = prevBanks;
-        return restOfCountries;
-      }
-
-      return {
-        ...prevBanks,
+    const updatedCountryBanks = banksData[country].filter(
+      (_: any, i: number) => i !== index
+    );
+    if (updatedCountryBanks.length === 0) {
+      const { [country]: _, ...restOfCountries } = banksData;
+      setValue("banks", restOfCountries); // Update using setValue
+    } else {
+      setValue("banks", {
+        ...banksData,
         [country]: updatedCountryBanks,
-      };
-    });
+      });
+    }
   };
 
   return (
@@ -304,31 +308,29 @@ export const AddBanksDialog = () => {
           </div>
           {/* Selected Details */}
           <div className="font-roboto col-span-2 border border-borderCol rounded-md h-80 overflow-y-auto w-full grid grid-cols-2 gap-x-4 gap-y-3 px-3 py-3">
-            {Object.keys(banksData)
-              .filter((country) => country !== "Pakistan")
-              .map((country) => (
-                <div key={country}>
-                  <h3 className="font-normal text-[#44444F] w-full border-b border-b-neutral-400 mb-1 capitalize">
-                    {country}
-                  </h3>
-                  <div className="flex flex-col gap-y-2">
-                    {banksData[country].map((bank, idx) => (
-                      <div
-                        key={`${bank}-${idx}`}
-                        className="flex items-start gap-x-2"
-                      >
-                        <X
-                          onClick={() => handleBankDelete(country, idx)}
-                          className="size-4 text-red-500 cursor-pointer"
-                        />
-                        <p className="text-[#44444F] text-sm capitalize">
-                          {bank.name}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+            {Object.keys(banksData).map((country) => (
+              <div key={country}>
+                <h3 className="font-normal text-[#44444F] w-full border-b border-b-neutral-400 mb-1 capitalize">
+                  {country}
+                </h3>
+                <div className="flex flex-col gap-y-2">
+                  {banksData[country].map((bank, idx) => (
+                    <div
+                      key={`${bank}-${idx}`}
+                      className="flex items-start gap-x-2"
+                    >
+                      <X
+                        onClick={() => handleBankDelete(country, idx)}
+                        className="size-4 text-red-500 cursor-pointer"
+                      />
+                      <p className="text-[#44444F] text-sm capitalize">
+                        {bank.name}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </div>
         <div className="flex items-center justify-around gap-5">

@@ -29,11 +29,7 @@ export const RiskBanks = ({
       <p className="text-lightGray font-semibold">
         Select banks you want to send your risk participation request
       </p>
-      <AddBanksDialog
-        countries={countries}
-        flags={flags}
-        setBanksData={setBanksData}
-      />
+      <AddBanksDialog setValue={setValue} watch={watch} />
     </div>
   );
 };

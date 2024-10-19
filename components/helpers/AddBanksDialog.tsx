@@ -120,7 +120,7 @@ export const AddBanksDialog = ({ setValue, watch }) => {
 
     const newBank: Bank = {
       country: countryVal,
-      name: bankVal,
+      bank: bankVal,
       city: cityVal,
       swiftCode: swiftCodeVal,
     };
@@ -314,7 +314,7 @@ export const AddBanksDialog = ({ setValue, watch }) => {
                 <div className="flex flex-col gap-y-2">
                   {groupedBanks[country].map((bank: Bank, idx: number) => (
                     <div
-                      key={`${bank.name}-${idx}`}
+                      key={`${bank.bank}-${idx}`}
                       className="flex items-start gap-x-2"
                     >
                       <X
@@ -322,7 +322,7 @@ export const AddBanksDialog = ({ setValue, watch }) => {
                         className="size-4 text-red-500 cursor-pointer"
                       />
                       <p className="text-[#44444F] text-sm capitalize">
-                        {bank.name}
+                        {bank.bank}
                       </p>
                     </div>
                   ))}

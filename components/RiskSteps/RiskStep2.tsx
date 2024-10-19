@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
 import { CheckBoxInput } from "@/app/register/bank/page";
+import { formatAmount } from "@/utils";
 
 interface Props {
   register: any;
@@ -31,11 +32,12 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
 
   const riskParticipation = watch("riskParticipation");
   const amount = watch("riskParticipationTransaction.amount");
+  const transactionType = watch("transactionType");
   const isParticipationOffered = watch(
     "riskParticipationTransaction.isParticipationOffered",
     false
   );
-  const pricingOffered = watch("riskParticipationTransaction.pricingOffered");
+  const pricingOffered = watch("riskParticipationTransaction.pricing");
 
   const handleChange = (e: any) => {
     const { value } = e.target;
@@ -95,7 +97,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
         (parseFloat(rawValue) * parseFloat(percentageValue)) / 100;
       setValue(
         "riskParticipationTransaction.participationValue",
-        calculatedValue.toLocaleString()
+        calculatedValue
       );
     }
   }, [rawValue, percentageValue]);
@@ -120,7 +122,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
       value = "100";
     }
     setPercentageValue(value);
-    setValue("riskParticipationTransaction.percentageOffered", value);
+    setValue("riskParticipationTransaction.percentage", value);
   };
 
   return (
@@ -165,60 +167,49 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                 id="transaction-confirmation"
                 label="LC Confirmation"
                 className="h-14"
-                name="riskParticipationTransaction.type"
+                name="transactionType"
                 value="LC Confirmation"
-                checked={
-                  watch("riskParticipationTransaction.type") ===
-                  "LC Confirmation"
-                }
+                checked={transactionType === "LC Confirmation"}
                 register={register}
               />
               <BankRadioInput
                 id="LG (letter Of Guarantee)"
                 label="LG (letter Of Guarantee)"
                 className="h-14"
-                name="riskParticipationTransaction.type"
+                name="transactionType"
                 value="LG (letter Of Guarantee)"
                 disabled={true}
-                checked={
-                  watch("riskParticipationTransaction.type") ===
-                  "LG (letter Of Guarantee)"
-                }
+                checked={transactionType === "LG (letter Of Guarantee)"}
                 register={register}
               />
               <BankRadioInput
                 id="SBLC"
                 label="SBLC"
                 className="h-14"
-                name="riskParticipationTransaction.type"
+                name="transactionType"
                 value="SBLC"
                 disabled={true}
-                checked={watch("riskParticipationTransaction.type") === "SBLC"}
+                checked={transactionType === "SBLC"}
                 register={register}
               />
               <BankRadioInput
                 id="transaction-avalization"
                 label="Avalization"
                 className="h-14"
-                name="riskParticipationTransaction.type"
+                name="transactionType"
                 value="Avalization"
                 disabled={true}
-                checked={
-                  watch("riskParticipationTransaction.type") === "Avalization"
-                }
+                checked={transactionType === "Avalization"}
                 register={register}
               />
               <BankRadioInput
                 id="transaction-supply"
                 className="h-14"
                 label="Supply Chain Finance (payable finance)"
-                name="riskParticipationTransaction.type"
+                name="transactionType"
                 value="Supply Chain Finance"
                 disabled={true}
-                checked={
-                  watch("riskParticipationTransaction.type") ===
-                  "Supply Chain Finance"
-                }
+                checked={transactionType === "Supply Chain Finance"}
                 register={register}
               />
             </div>
@@ -307,8 +298,8 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                   <input
                     type="text"
                     readOnly
-                    value={watch(
-                      "riskParticipationTransaction.participationValue"
+                    value={formatAmount(
+                      watch("riskParticipationTransaction.participationValue")
                     )}
                     className="py-[26px] border border-borderCol flex h-10 w-full rounded-md bg-background px-3 text-sm bg-[#E9E9F0]"
                   />

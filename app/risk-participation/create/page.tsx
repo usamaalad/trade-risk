@@ -36,11 +36,9 @@ const RiskFundedPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { countries, flags } = useCountries();
+  const [days, setDays] = useState<number>(90);
   const countryNames = bankCountries.map((country) => country.name);
   const countryFlags = bankCountries.map((country) => country.flag);
-  const riskParticipationTransaction = watch(
-    "riskParticipationTransaction.type"
-  );
 
   useEffect(() => {
     router.prefetch("/");
@@ -81,6 +79,11 @@ const RiskFundedPage = () => {
             setValue(key, value);
           }
         }
+        if (key === "extraInfo") {
+          setDays(value?.days);
+          setValue("extraInfo.days", value.days);
+          setValue("extraInfo.other", value?.other);
+        }
       });
     }
   }, [formData, setValue]);
@@ -94,70 +97,33 @@ const RiskFundedPage = () => {
   }, [router, pathname, setFormData, reset]);
 
   const onSubmit: SubmitHandler<typeof generalRiskSchema> = async (
-    dirtyData,
+    data,
     isDraft
   ) => {
-    console.log("🚀 ~ RiskFundedPage ~ data:", dirtyData);
-    return;
-    const data = cleanData(dirtyData);
-    const startDateString = data?.period?.startDate;
-    const expiryDateString = data?.expiryDate;
-    const expectedDateDiscountingString = data?.expectedDateDiscounting;
-    const expectedDateConfirmationString = data?.expectedDateConfirmation;
-
-    const startDate = startDateString ? new Date(startDateString) : null;
-    const period = {
-      startDate,
-      expectedDate: data?.period?.expectedDate,
-    };
-    const expiryDate = expiryDateString ? new Date(expiryDateString) : null;
-    const expectedDateDiscounting = expectedDateDiscountingString
-      ? new Date(expectedDateDiscountingString)
-      : null;
-    const expectedDateConfirmation = expectedDateConfirmationString
-      ? new Date(expectedDateConfirmationString)
-      : null;
+    let extraInfoObj;
+    console.log(data, "data");
+    if (
+      data.paymentTerms &&
+      data.paymentTerms !== "Sight LC" &&
+      data.extraInfo
+    ) {
+      console.log("something");
+      extraInfoObj = { days: days, other: data.extraInfo.other };
+    }
 
     const preparedData = {
       ...data,
-      period,
-      expiryDate,
-      expectedDateConfirmation,
     };
-
-    if (expectedDateDiscounting) {
-      preparedData.expectedDateDiscounting = expectedDateDiscounting;
-    }
-    if (data.transaction !== "Risk Participation") {
-      delete data.expectedDateConfirmation;
-    }
-    if (!data?.isLcDiscounting) {
-      delete preparedData?.isLcDiscounting;
-      data["isLcDiscounting"] = "no";
-    }
-    if (!data?.expectedDiscounting) {
-      delete preparedData?.expectedDiscounting;
-      data["expectedDiscounting"] = "no";
-    }
-    if (!data?.expectedDateDiscounting) {
-      delete preparedData?.expectedDateDiscounting;
-      data["expectedDateDiscounting"] = new Date();
-    }
-    if (!data?.paymentReceviedType) {
-      delete preparedData?.paymentReceviedType;
-      data["paymentReceviedType"] = "all-prices";
-    }
 
     try {
       const validationResult = await generalRiskSchema.validate(preparedData, {
         abortEarly: false,
       });
-      console.log(validationResult);
+      console.log(validationResult, "validation");
 
       const reqData = {
-        ...data,
-        period,
-        transhipment: data?.transhipment === "no" ? false : true,
+        ...validationResult,
+        draft: false,
       };
 
       // Clean up the reqData object
@@ -268,7 +234,8 @@ const RiskFundedPage = () => {
           register={register}
           watch={watch}
           setValue={setValue}
-          control={control}
+          days={days}
+          setDays={setDays}
         />
         <RiskStep4
           countries={countries}

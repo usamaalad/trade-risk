@@ -68,7 +68,7 @@ export const AddBid = ({
   lcData: ILcs;
 }) => {
   const { user } = useAuth();
-  const isDiscount = lcData?.type.includes("Discount");
+  const isDiscount = lcData?.type?.includes("Discount");
   const [showPreview, setShowPreview] = useState(false);
   const [userBidStatus, setUserBidStatus] = useState<any>({});
   const [userBids, setUserBids] = useState();
@@ -83,7 +83,7 @@ export const AddBid = ({
   useEffect(() => {
     const userBids =
       lcData?.bids
-        .filter((bid: any) => bid.createdBy === user?._id)
+        ?.filter((bid: any) => bid.createdBy === user?._id)
         .sort(
           (a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -95,7 +95,7 @@ export const AddBid = ({
       setShowPreview(true);
     }
 
-    const anotherBankBidAccepted = lcData?.bids.some(
+    const anotherBankBidAccepted = lcData?.bids?.some(
       (bid: any) => bid.status === "Accepted" && bid.createdBy !== user?._id
     );
 

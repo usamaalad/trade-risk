@@ -377,7 +377,7 @@ export const RequestTable = ({
       disableColumnMenu: true,
       hideSortIcons: true,
       valueGetter: (value) => {
-        return value.length || 0; // Return 0 if no bids
+        return value?.length || 0;
       },
       renderHeader: () => (
         <div className="flex items-center justify-between">

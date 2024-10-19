@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { ValidatingCalendar } from "../LCSteps/Step3Helpers";
 import { UseFormRegister } from "react-hook-form";
 import { generalRiskSchema } from "@/validation/risk.validation";
+import Period from "../RiskParticipation/Period";
 
 export const DiscountBanks = ({
   countries,
@@ -121,11 +122,11 @@ export const DiscountBanks = ({
           </div>
         </div>
       </div>
-      <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
+      <div className="border border-borderCol rounded-md pt-3 px-2 w-full bg-[#F5F7F9]">
         <p className="font-semibold mb-2 ml-3 text-sm text-[#1A1A26]">
           LC Confirming Details
         </p>
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-2 mb-2">
           <DDInput
             placeholder="Select a country"
             label="Country"
@@ -153,6 +154,12 @@ export const DiscountBanks = ({
             }
           />
         </div>
+        <Period
+          setValue={setValue}
+          watch={watch}
+          flags={flags}
+          isConfirming={true}
+        />
       </div>
     </div>
   );

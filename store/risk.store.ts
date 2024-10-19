@@ -65,7 +65,6 @@
 
 // export default useRiskStore;
 
-
 import { IRisk } from "@/types/type";
 import { create } from "zustand";
 
@@ -80,52 +79,53 @@ const useRiskStore = create<RiskState>((set) => ({
     country: "",
     bank: "",
   },
-  attachment: [],
-  banks: [],
+  attachment: [], // Array for file attachments
+  banks: [], // Array of bank objects
   confirmingBank: {
     country: "",
     bank: "",
+    dateType: "", // New field to match validation
+    date: "", // New field to match validation
   },
   createdBy: "",
-  description: "",
-  draft: false,
-  expectedDateConfimation: "",
-  expectedDateDiscounting: "",
-  expectedDiscounting: false,
-  expiryDate: "",
+  productDescription: "", // Product description
+  draft: false, // Draft flag
   exporterInfo: {
     beneficiaryCountry: "",
     beneficiaryName: "",
     countryOfExport: "",
   },
-  importerInfo: { applicantName: "", countryOfImport: "" },
-  isDeleted: false,
-  isLcDiscounting: false,
+  importerInfo: {
+    name: "", // Updated to match validation
+    countryOfImport: "",
+    port: "", // Port of import added
+  },
+  isDeleted: false, // Deletion flag
   issuingBank: {
     country: "",
     bank: "",
   },
-  note: "",
-  outrightSales: "",
-  paymentTerms: "",
-  riskParticipation: "",
+  additionalNotes: "", // Additional notes
+  paymentTerms: "", // Payment terms
+  riskParticipation: "", // Risk participation type
   riskParticipationTransaction: {
-    type: "",
-    amount: 0,
-    perAnnum: "",
-    returnOffer: "",
-    baseRate: "",
+    currency: "USD", // Default currency
+    amount: 0, // Amount
+    isParticipationOffered: false, // Participation offered flag
+    percentage: 0, // Participation percentage
+    participationCurrency: "USD", // Participation currency
+    participationValue: 0, // Participation value
+    pricingOffered: 0, // Pricing offered
   },
   shipmentPort: {
     country: "",
     port: "",
   },
-  startDate: "",
-  transaction: "",
-  transhipment: false,
-  __v: 0,
-  _id: "",
-  createdAt: new Date(),
+  transaction: "", // Transaction type
+  transhipment: false, // Transhipment flag
+  __v: 0, // Version
+  _id: "", // ID
+  createdAt: new Date(), // Creation date
 
   setValues: (values: Partial<IRisk> | null) =>
     set((state) => ({
@@ -135,7 +135,9 @@ const useRiskStore = create<RiskState>((set) => ({
 }));
 
 // Function to get state values excluding setValues
-export const getStateValues = (state: RiskState): Omit<RiskState, 'setValues'> => {
+export const getStateValues = (
+  state: RiskState
+): Omit<RiskState, "setValues"> => {
   const { setValues, ...stateValues } = state;
   return stateValues;
 };

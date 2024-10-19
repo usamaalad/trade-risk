@@ -13,37 +13,39 @@ export default function Period({
   watch,
   setValue,
   isRisk = false,
+  isConfirming = false,
 }: {
   watch: any;
   setValue: any;
   isRisk?: boolean;
+  isConfirming?: boolean;
 }) {
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
 
-  const lcPeriodType = watch("period.expectedDate");
-  const lcStartDate = watch("period.startDate");
-  const riskPeriodType = watch("lcPeriod.dateType");
-  const riskDate = watch("lcPeriod.date");
+  // Determine field names based on props
+  const dateTypeFieldName = isRisk
+    ? "lcPeriod.dateType"
+    : isConfirming
+    ? "confirmingBank.dateType"
+    : "period.expectedDate";
+  const dateFieldName = isRisk
+    ? "lcPeriod.date"
+    : isConfirming
+    ? "confirmingBank.date"
+    : "period.startDate";
+
+  const dateType = watch(dateTypeFieldName);
+  const dateValue = watch(dateFieldName);
 
   useEffect(() => {
-    if (lcStartDate) {
-      setStartDate(new Date(lcStartDate));
+    if (dateValue) {
+      setStartDate(new Date(dateValue));
     }
-  }, [lcStartDate]);
-
-  useEffect(() => {
-    if (riskDate) {
-      setStartDate(new Date(riskDate));
-    }
-  }, [riskDate]);
+  }, [dateValue]);
 
   const handleRadioChange = (e: any) => {
-    if (isRisk) {
-      setValue("lcPeriod.dateType", e.target.value);
-    } else {
-      setValue("period.expectedDate", e.target.value);
-    }
+    setValue(dateTypeFieldName, e.target.value);
   };
 
   const updateValue = (name: string, value: any) => {
@@ -51,95 +53,88 @@ export default function Period({
     setValue("lastDateOfReceivingBids", undefined);
   };
 
+  // Define radio options based on props
+  const options = isRisk
+    ? [
+        {
+          id: "date-lc-issued",
+          value: "Date LC issued",
+          label: "Date LC Issued",
+        },
+        {
+          id: "expected-date-issue",
+          value: "Expected date of LC issuance",
+          label: "Expected date of LC issuance",
+        },
+      ]
+    : isConfirming
+    ? [
+        {
+          id: "date-lc-confirmed",
+          value: "Date LC confirmed",
+          label: "Date LC confirmed",
+        },
+        {
+          id: "expected-date-confirm",
+          value: "Expected date to confirm",
+          label: "Expected date to confirm",
+        },
+      ]
+    : [
+        { id: "date-lc-issued", value: "yes", label: "Date LC Issued" },
+        {
+          id: "expected-date",
+          value: "no",
+          label: "Expected date of LC issuance",
+        },
+      ];
+
+  // Normalize dateType for comparison
+  const dateTypeNormalized = (() => {
+    if (isRisk || isConfirming) return dateType;
+    if (dateType === true) return "yes";
+    if (dateType === false) return "no";
+    return dateType;
+  })();
+
   return (
     <div className="flex gap-y-4 items-center justify-between border border-borderCol rounded-md py-2 px-3 mb-3 bg-white">
-      {isRisk ? (
-        <div className="flex items-center gap-x-4">
-          <div className="w-full rounded-md flex items-center gap-x-2">
+      <div className="flex items-center gap-x-4">
+        {options.map((option) => (
+          <div
+            key={option.id}
+            className="w-full rounded-md flex items-center gap-x-2"
+          >
             <input
               type="radio"
-              id="date-lc-issued"
+              id={option.id}
               className="accent-primaryCol size-4"
-              name="lcPeriod.dateType"
-              value="Date LC issued"
-              checked={riskPeriodType === "Date LC issued"}
+              name={dateTypeFieldName}
+              value={option.value}
+              checked={dateTypeNormalized === option.value}
               onChange={handleRadioChange}
             />
             <label
-              htmlFor="date-lc-issued"
+              htmlFor={option.id}
               className="text-sm text-lightGray font-normal"
             >
-              Date LC Issued
+              {option.label}
             </label>
           </div>
-          <div className="w-full rounded-md flex items-center gap-x-2">
-            <input
-              type="radio"
-              id="expected-date"
-              className="accent-primaryCol !bg-white size-4"
-              name="lcPeriod.dateType"
-              value="Expected date of LC issuance"
-              checked={riskPeriodType === "Expected date of LC issuance"}
-              onChange={handleRadioChange}
-            />
-            <label
-              htmlFor="expected-date"
-              className="text-sm text-lightGray font-normal"
-            >
-              Expected date of LC issuance
-            </label>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-x-4">
-          <div className="w-full rounded-md flex items-center gap-x-2">
-            <input
-              type="radio"
-              id="date-lc-issued"
-              className="accent-primaryCol size-4"
-              name="period.expectedDate"
-              value="yes"
-              checked={lcPeriodType === "yes" || lcPeriodType === true}
-              onChange={handleRadioChange}
-            />
-            <label
-              htmlFor="date-lc-issued"
-              className="text-sm text-lightGray font-normal"
-            >
-              Date LC Issued
-            </label>
-          </div>
-          <div className="w-full rounded-md flex items-center gap-x-2">
-            <input
-              type="radio"
-              id="expected-date"
-              className="accent-primaryCol !bg-white size-4"
-              name="period.expectedDate"
-              value="no"
-              checked={lcPeriodType === "no" || lcPeriodType === false}
-              onChange={handleRadioChange}
-            />
-            <label
-              htmlFor="expected-date"
-              className="text-sm text-lightGray font-normal"
-            >
-              Expected date of LC issuance
-            </label>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
       <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
             className={`w-fit justify-start text-left font-normal border-none ${
-              lcStartDate ? "text-black" : "text-[#B5B5BE] "
+              dateValue ? "text-black" : "text-[#B5B5BE]"
             }`}
             id="period-lc-date"
-            disabled={!lcPeriodType && !riskPeriodType}
+            disabled={!dateType}
           >
-            {lcStartDate ? (
-              format(new Date(lcStartDate), "PPP")
+            {dateValue ? (
+              format(new Date(dateValue), "PPP")
             ) : (
               <span>DD/MM/YYYY</span>
             )}
@@ -147,26 +142,18 @@ export default function Period({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          {lcPeriodType === "yes" ? (
-            <ValidatingCalendar
-              initialDate={startDate}
-              onChange={(date) => {
-                updateValue("period.startDate", date);
-                setStartDate(date);
-              }}
-              onClose={() => setDatePopoverOpen(false)}
-              isPast
-            />
-          ) : (
-            <ValidatingCalendar
-              initialDate={lcStartDate}
-              onChange={(date) => {
-                updateValue("period.startDate", date);
-                setStartDate(date);
-              }}
-              onClose={() => setDatePopoverOpen(false)}
-            />
-          )}
+          <ValidatingCalendar
+            initialDate={startDate}
+            onChange={(date) => {
+              updateValue(dateFieldName, date);
+              setStartDate(date);
+            }}
+            onClose={() => setDatePopoverOpen(false)}
+            isPast={
+              dateTypeNormalized === "yes" ||
+              dateTypeNormalized === "Date LC issued"
+            }
+          />
         </PopoverContent>
       </Popover>
     </div>

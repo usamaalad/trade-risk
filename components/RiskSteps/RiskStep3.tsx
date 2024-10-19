@@ -14,6 +14,9 @@ interface Props {
   register: any;
   watch: any;
   setValue: any;
+  days: number;
+  setDays: any;
+  draftDataId: string
 }
 
 export const RiskStep3 = ({
@@ -22,6 +25,9 @@ export const RiskStep3 = ({
   register,
   watch,
   setValue,
+  days,
+  setDays,
+  draftDataId,
 }: Props) => {
   const [portCountries, setPortCountries] = useState<string[]>([]);
   const [ports, setPorts] = useState<string[]>([]);
@@ -37,7 +43,6 @@ export const RiskStep3 = ({
     startDate,
     expiryDate,
     expectedDateConfirmation,
-    days,
   } = watch();
 
   const { data } = useLcIssuance();
@@ -77,13 +82,57 @@ export const RiskStep3 = ({
       setPortCountries(allPortCountries);
     }
   }, [portsData]);
-  const [dayss, setDays] = useState<number | string>();
+
+  useEffect(() => {
+    if (!draftDataId) {
+      if (paymentTerms === "Sight LC") {
+        setValue("extraInfo", undefined);
+      } else if (paymentTerms !== "Sight LC") {
+        setValue("extraInfo", undefined);
+        setDays(90);
+      }
+    } else {
+      setIsOthersSelected(false);
+      setValue("extraInfo.other", "");
+      setOtherValue("");
+    }
+  }, [paymentTerms]);
+
+  useEffect(() => {
+    if (draftDataId) {
+      if (
+        extraInfo.other !== "shipment date" &&
+        extraInfo.other !== "acceptance date" &&
+        extraInfo.other !== "negotiation date" &&
+        extraInfo.other !== "invoice date" &&
+        extraInfo.other !== "sight" &&
+        extraInfo.other
+      ) {
+        setValue("extraInfo.other", extraInfo.other);
+        setOtherValue(extraInfo.other);
+        setIsOthersSelected(true);
+      }
+    }
+  }, [extraInfo]);
+
+  useEffect(() => {
+    if (
+      extraInfo.other === "shipment date" ||
+      extraInfo.other === "acceptance date" ||
+      extraInfo.other === "negotiation date" ||
+      extraInfo.other === "invoice date" ||
+      extraInfo.other === "sight"
+    ) {
+      setIsOthersSelected(false);
+      setOtherValue("");
+    }
+  }, [extraInfo.other]);
 
   useEffect(() => {
     if (watch("paymentTerms") !== "Tenor LC") {
       setValue("days", undefined);
     } else {
-      setValue("days", dayss);
+      setValue("days", days);
     }
   }, [watch("paymentTerms")]);
 
@@ -172,6 +221,7 @@ export const RiskStep3 = ({
                     onChange={(e: any) => {
                       const value = e.target.value;
                       if (value === "" || Number(value) <= 999) {
+                        console.log(value, "opopopop");
                         setDays(value === "" ? 0 : Number(value));
                         setValue(
                           "extraInfo.days",
@@ -187,6 +237,7 @@ export const RiskStep3 = ({
                       onClick={() => {
                         if (days >= 999) return;
                         else {
+                          console.log(days, "opopopop");
                           const newDays = Number(days) + 1;
                           setDays(newDays);
                           setValue("extraInfo.days", newDays);

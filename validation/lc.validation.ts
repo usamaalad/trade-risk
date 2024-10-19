@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-const fileSchema = Yup.object().shape({
+export const fileSchema = Yup.object().shape({
   url: Yup.string().required("File URL is required"),
   userFileName: Yup.string().required("User file name is required"),
   firebaseFileName: Yup.string().required("Firebase file name is required"),

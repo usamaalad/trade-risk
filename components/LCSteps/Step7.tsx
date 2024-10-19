@@ -55,7 +55,7 @@ const FileCard = ({
       <Button
         type="button"
         variant="ghost"
-        onClick={() => onRemoveFile(file.firebaseFileName)}
+        onClick={() => onRemoveFile(file.userFileName)}
       >
         <X className="text-lightGray" />
       </Button>
@@ -64,11 +64,9 @@ const FileCard = ({
 };
 
 export const Step7 = ({
-  register,
   step,
   setValue,
   watch,
-  setStepCompleted,
 }: {
   register: UseFormRegister<any>;
   setValue: UseFormSetValue<any>;
@@ -87,10 +85,6 @@ export const Step7 = ({
       fileType: string;
     }[]
   >([]);
-  const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
   const { addStep, removeStep } = useStepStore();
 
   useEffect(() => {
@@ -128,7 +122,7 @@ export const Step7 = ({
       });
 
       if (filteredFiles.length + files.length > 3) {
-        setUploadError("You can upload up to 3 files only.");
+        toast.error("You can upload up to 3 files only.");
         return;
       }
 
@@ -138,9 +132,6 @@ export const Step7 = ({
       );
 
       if (duplicateFiles.length > 0) {
-        setUploadError(
-          "Duplicate file(s) detected. Please choose unique files."
-        );
         toast.error(`Duplicate file(s) detected. Please choose unique files.`);
         return;
       }
@@ -160,26 +151,27 @@ export const Step7 = ({
             };
 
             setFiles((prevFiles) => {
-              const updatedFiles = [...prevFiles, newFile];
-              setValue(
-                "attachments",
-                updatedFiles.map((f) => ({
-                  url: f.url,
-                  userFileName: f.userFileName,
-                  firebaseFileName: f.firebaseFileName,
-                  fileSize: f.fileSize,
-                  fileType: f.fileType,
-                }))
-              );
-              return updatedFiles.slice(0, 3); // Limit to 3 files
+              const updatedFiles = [...prevFiles, newFile].slice(0, 3); // Limit to 3 files
+              return updatedFiles;
             });
+            setValue(
+              "attachments",
+              (attachments || [])
+                .concat({
+                  url: newFile.url,
+                  userFileName: newFile.userFileName,
+                  firebaseFileName: newFile.firebaseFileName,
+                  fileSize: newFile.fileSize,
+                  fileType: newFile.fileType,
+                })
+                .slice(0, 3)
+            );
           },
           (error) => {
-            setUploadError(error.message);
+            toast.error("Unable to upload file. Please try again.");
           },
           (progressBar, progress) => {
-            setShowProgressBar(progressBar);
-            setProgress(progress);
+            console.log(progress);
           }
         );
       });
@@ -211,7 +203,7 @@ export const Step7 = ({
           );
         },
         (error) => {
-          setUploadError(error.message);
+          toast.error("Unable to delete file. Please try again.");
         }
       );
     }

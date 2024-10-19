@@ -39,7 +39,7 @@ const FileUploadService = {
           }
         },
       });
-
+      console.log(response, "response");
       if (response.data.statusCode === 200) {
         onSuccess(response.data.data.url, response.data.data.fileName);
       } else {
@@ -59,6 +59,7 @@ const FileUploadService = {
       const response = await api.delete<{
         statusCode: number;
       }>(`/firebasestorage/${fileName}`);
+      console.log(response, "response");
       if (response.data.statusCode === 200) {
         onSuccess();
       } else {

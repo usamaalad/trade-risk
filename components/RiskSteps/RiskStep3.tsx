@@ -78,7 +78,6 @@ export const RiskStep3 = ({
     }
   }, [portsData]);
   const [dayss, setDays] = useState<number | string>();
-  console.log("🚀 ~ dayss:", dayss);
 
   useEffect(() => {
     if (watch("paymentTerms") !== "Tenor LC") {
@@ -86,7 +85,7 @@ export const RiskStep3 = ({
     } else {
       setValue("days", dayss);
     }
-  }, [watch("paymentTerms"), dayss, setValue]);
+  }, [watch("paymentTerms")]);
 
   return (
     <div className="py-4 pt-6 px-4 border border-borderCol rounded-lg w-full bg-white">

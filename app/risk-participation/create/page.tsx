@@ -6,7 +6,6 @@ import {
   RiskStep4,
   RiskStep5,
   RiskStep6,
-  RiskStep7,
   RiskStep8,
   RiskStep3,
   RiskStep2,
@@ -27,6 +26,7 @@ import { toast } from "sonner";
 import * as Yup from "yup";
 import useRiskStore from "@/store/risk.store";
 import LgStep12 from "@/components/LG-Steps/LgStep12";
+import { Step7 } from "@/components/LCSteps";
 
 const RiskFundedPage = () => {
   const { register, setValue, reset, watch, getValues, control, handleSubmit } =
@@ -288,8 +288,8 @@ const RiskFundedPage = () => {
         {hideStep6 ? null : <RiskStep6 register={register} watch={watch} />}
 
         <div className="relative flex items-center justify-between h-full gap-x-2">
-          <div className="w-1/2">
-            <RiskStep7 step={hideStep6 ? 6 : undefined} watch={watch} />
+          <div className="w-1/2 bg-white rounded-md">
+            <Step7 step={6} watch={watch} setValue={setValue} />
           </div>
           <div className="w-1/2 space-y-2">
             <div className="bg-white rounded-lg">

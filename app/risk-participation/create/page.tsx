@@ -26,6 +26,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as Yup from "yup";
 import useRiskStore from "@/store/risk.store";
+import LgStep12 from "@/components/LG-Steps/LgStep12";
 
 const RiskFundedPage = () => {
   const { register, setValue, reset, watch, getValues, control, handleSubmit } =
@@ -96,9 +97,9 @@ const RiskFundedPage = () => {
     dirtyData,
     isDraft
   ) => {
+    console.log("🚀 ~ RiskFundedPage ~ data:", dirtyData);
+    return;
     const data = cleanData(dirtyData);
-    console.log("🚀 ~ RiskFundedPage ~ data:", data);
-
     const startDateString = data?.period?.startDate;
     const expiryDateString = data?.expiryDate;
     const expectedDateDiscountingString = data?.expectedDateDiscounting;
@@ -286,13 +287,25 @@ const RiskFundedPage = () => {
         />
         {hideStep6 ? null : <RiskStep6 register={register} watch={watch} />}
 
-        <div className="relative flex items-center justify-between w-full h-full gap-x-2">
-          <RiskStep7 step={hideStep6 ? 6 : undefined} watch={watch} />
-          <RiskStep8
-            step={hideStep6 ? 7 : undefined}
-            watch={watch}
-            register={register}
-          />
+        <div className="relative flex items-center justify-between h-full gap-x-2">
+          <div className="w-1/2">
+            <RiskStep7 step={hideStep6 ? 6 : undefined} watch={watch} />
+          </div>
+          <div className="w-1/2 space-y-2">
+            <div className="bg-white rounded-lg">
+              <LgStep12
+                register={register}
+                setValue={setValue}
+                step={7}
+                watch={watch}
+              />
+            </div>
+            <RiskStep8
+              step={hideStep6 ? 8 : undefined}
+              watch={watch}
+              register={register}
+            />
+          </div>
         </div>
 
         <div className="py-4 px-4 border border-borderCol rounded-lg w-full bg-white flex items-center justify-between gap-x-4">

@@ -109,7 +109,6 @@ export const Step7 = ({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
-    console.log(event, "event");
     if (selectedFiles) {
       const newFiles = Array.from(selectedFiles);
 

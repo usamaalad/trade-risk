@@ -50,7 +50,7 @@ export const RiskAgreement = ({ register, watch, setValue }: Props) => {
           };
 
           setSelectedFile(newFile);
-          setValue("uploadSignedCopy", [
+          setValue("signedCopy", [
             {
               url: newFile.url,
               userFileName: newFile.userFileName,
@@ -77,7 +77,7 @@ export const RiskAgreement = ({ register, watch, setValue }: Props) => {
         selectedFile.firebaseFileName,
         () => {
           setSelectedFile(null);
-          setValue("uploadSignedCopy", []);
+          setValue("signedCopy", []);
         },
         (error) => {
           toast.error("Unable to delete file. Please try again.");

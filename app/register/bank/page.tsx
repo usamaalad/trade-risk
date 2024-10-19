@@ -45,15 +45,19 @@ export const CheckBoxInput = ({
   checked?: boolean; // Accept checked prop
 }) => {
   return (
-    <div className="my-2 flex items-center space-x-2 font-roboto">
+    <div className="my-2 flex items-center space-x-2 font-roboto w-full">
       <input
         type="checkbox"
         id={id}
         {...register(id)}
         onChange={onChange}
         checked={checked} // Bind checked prop
+        className="mt-1 px-2" // Adjust vertical alignment for small screens
       />
-      <label htmlFor={id} className="text-sm leading-none text-[#44444F]">
+      <label
+        htmlFor={id}
+        className="text-sm leading-none text-[#44444F] whitespace-normal break-words"
+      >
         {label}
       </label>
     </div>

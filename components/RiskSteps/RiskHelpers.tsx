@@ -33,6 +33,7 @@ export const DiscountBanks = ({
   watch?: any;
 }) => {
   const { issuingBank, advisingBank } = watch();
+  const confirmingBank = watch("confirmingBank");
 
   const { data: issuingBanks } = useQuery({
     queryKey: ["issuing-banks", issuingBank?.country],
@@ -46,49 +47,90 @@ export const DiscountBanks = ({
     enabled: !!advisingBank?.country,
   });
 
+  const { data: confirmingBanks } = useQuery({
+    queryKey: ["confirming-banks", confirmingBank?.country],
+    queryFn: () => getBanks(confirmingBank?.country),
+    enabled: !!confirmingBank?.country,
+  });
+
   return (
-    <div className="flex items-center justify-between w-full mb-3 gap-x-4 flex-wrap xl:flex-nowrap">
-      {/* Issuing Bank */}
-      <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
-        <p className="font-semibold mb-2 ml-3 text-sm text-[#1A1A26]">
-          LC Issuing Bank
-        </p>
-        <div className="flex flex-col gap-y-2">
-          <DDInput
-            placeholder="Select a country"
-            label="Country"
-            id="issuingBank.country"
-            value={issuingBank?.country}
-            data={countries}
-            flags={flags}
-            setValue={setValue}
-          />
-          <DDInput
-            placeholder="Select bank"
-            label="Bank"
-            id="issuingBank.bank"
-            value={issuingBank?.bank}
-            setValue={setValue}
-            disabled={
-              !issuingBanks || !issuingBanks?.response || !issuingBanks.success
-            }
-            data={
-              issuingBanks && issuingBanks.success && issuingBanks?.response
-            }
-          />
+    <div className="mb-3">
+      <div className="flex items-center justify-between w-full mb-3 gap-x-4 flex-wrap xl:flex-nowrap">
+        {/* Issuing Bank */}
+        <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
+          <p className="font-semibold mb-2 ml-3 text-sm text-[#1A1A26]">
+            LC Issuing Bank
+          </p>
+          <div className="flex flex-col gap-y-2">
+            <DDInput
+              placeholder="Select a country"
+              label="Country"
+              id="issuingBank.country"
+              value={issuingBank?.country}
+              data={countries}
+              flags={flags}
+              setValue={setValue}
+            />
+            <DDInput
+              placeholder="Select bank"
+              label="Bank"
+              id="issuingBank.bank"
+              value={issuingBank?.bank}
+              setValue={setValue}
+              disabled={
+                !issuingBanks ||
+                !issuingBanks?.response ||
+                !issuingBanks.success
+              }
+              data={
+                issuingBanks && issuingBanks.success && issuingBanks?.response
+              }
+            />
+          </div>
+        </div>
+        {/* Advising Bank */}
+        <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
+          <p className="font-semibold mb-2 ml-3 text-sm text-[#1A1A26]">
+            LC Advising Bank
+          </p>
+          <div className="flex flex-col gap-y-2">
+            <DDInput
+              placeholder="Select a country"
+              label="Country"
+              id="advisingBank.country"
+              value={advisingBank?.country}
+              data={countries}
+              flags={flags}
+              setValue={setValue}
+            />
+            <DDInput
+              placeholder="Select bank"
+              label="Bank"
+              id="advisingBank.bank"
+              value={advisingBank?.bank}
+              setValue={setValue}
+              disabled={
+                !advisingBanks ||
+                !advisingBanks?.response ||
+                !advisingBanks.success
+              }
+              data={
+                advisingBanks && advisingBanks.success && advisingBanks.response
+              }
+            />
+          </div>
         </div>
       </div>
-      {/* Advising Bank */}
       <div className="border border-borderCol rounded-md py-3 px-2 w-full bg-[#F5F7F9]">
         <p className="font-semibold mb-2 ml-3 text-sm text-[#1A1A26]">
-          LC Advising Bank
+          LC Confirming Details
         </p>
-        <div className="flex flex-col gap-y-2">
+        <div className="flex items-center gap-x-2">
           <DDInput
             placeholder="Select a country"
             label="Country"
-            id="advisingBank.country"
-            value={advisingBank?.country}
+            id="confirmingBank.country"
+            value={confirmingBank?.country}
             data={countries}
             flags={flags}
             setValue={setValue}
@@ -96,16 +138,18 @@ export const DiscountBanks = ({
           <DDInput
             placeholder="Select bank"
             label="Bank"
-            id="advisingBank.bank"
-            value={advisingBank?.bank}
+            id="confirmingBank.bank"
+            value={confirmingBank?.bank}
             setValue={setValue}
             disabled={
-              !advisingBanks ||
-              !advisingBanks?.response ||
-              !advisingBanks.success
+              !confirmingBanks ||
+              !confirmingBanks?.response ||
+              !confirmingBanks.success
             }
             data={
-              advisingBanks && advisingBanks.success && advisingBanks.response
+              confirmingBanks &&
+              confirmingBanks.success &&
+              confirmingBanks.response
             }
           />
         </div>

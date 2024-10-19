@@ -156,19 +156,7 @@ const RiskFundedPage = () => {
       const reqData = {
         ...data,
         period,
-        riskParticipationTransaction: {
-          ...data?.riskParticipationTransaction,
-          perAnnum: "22",
-        },
-        outrightSales:
-          data?.transaction === "Risk Participation"
-            ? undefined
-            : data?.outrightSales,
-        isLcDiscounting: data?.isLcDiscounting === "no" ? false : true,
-        expectedDiscounting: data?.expectedDiscounting === "no" ? false : true,
         transhipment: data?.transhipment === "no" ? false : true,
-        currency: data?.currency || "usd",
-        days: data?.paymentTerms === "Tenor LC" ? 22 : undefined,
       };
 
       // Clean up the reqData object
@@ -231,8 +219,6 @@ const RiskFundedPage = () => {
     setIsDraftLoading(true); // Start the draft loading state
     const reqData = {
       ...data,
-      isLcDiscounting: data?.isLcDiscounting === "no" ? false : true,
-      expectedDiscounting: data?.expectedDiscounting === "no" ? false : true,
       transhipment: data?.transhipment === "no" ? false : true,
       draft: true,
     };

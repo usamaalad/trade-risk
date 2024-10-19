@@ -6,6 +6,7 @@ import { getAllPortData, getPorts } from "@/services/apis/helpers.api";
 import { useQuery } from "@tanstack/react-query";
 import Period from "../RiskParticipation/Period";
 import useLcIssuance from "@/store/issueance.store";
+import { DatePicker } from "../helpers";
 
 interface Props {
   countries: string[];
@@ -28,9 +29,8 @@ export const RiskStep3 = ({
   let extraInfo = watch("extraInfo") || { days: 0, other: "" };
   const [isOthersSelected, setIsOthersSelected] = useState(false);
   const [otherValue, setOtherValue] = useState("");
-  const riskParticipationTransaction = watch(
-    "riskParticipationTransaction.type"
-  );
+  const lcExpiryDate = watch("lcPeriod.lcExpiry");
+  const issuanceDate = watch("lcPeriod.date");
   const {
     shipmentPort,
     expectedDateDiscounting,
@@ -104,14 +104,21 @@ export const RiskStep3 = ({
         setValue={setValue}
         watch={watch}
       />
-
-      <Period setValue={setValue} watch={watch} />
-      <DateInput
-        name="expiryDate"
-        value={expiryDate}
-        setValue={setValue}
-        title="LC Expiry Date"
-      />
+      <div className="flex items-center justify-between gap-x-3 w-full">
+        <div className="border border-borderCol py-3 px-2 rounded-md w-full min-h-40 h-44 bg-[#F5F7F9]">
+          <p className="font-semibold ml-3 text-sm mb-2">LC Expiry Date</p>
+          <Period setValue={setValue} watch={watch} isRisk={true} />
+          <DatePicker
+            value={lcExpiryDate}
+            placeholder="LC Expiry Date"
+            disabled={{ before: new Date() }}
+            extraClassName="h-14 bg-white opacity-1"
+            leftText={false}
+            name={`lcPeriod.lcExpiry`}
+            setValue={setValue}
+          />
+        </div>
+      </div>
 
       <div className="flex items-center justify-between gap-x-3 w-full my-4">
         <div className="rounded-md border border-borderCol bg-[#F5F7F9] px-2 py-3 w-full">
@@ -145,6 +152,7 @@ export const RiskStep3 = ({
               id="payment-upas"
               label="UPAS LC (Usance payment at sight)"
               name="paymentTerms"
+              extraClassName="h-14"
               value="UPAS LC"
               register={register}
               checked={paymentTerms === "UPAS LC"}
@@ -342,9 +350,9 @@ export const RiskStep3 = ({
       <div className="border border-borderCol pt-3 px-2 rounded-md w-full bg-[#F5F7F9] mt-3.5">
         <p className="text-sm font-semibold mb-2 ml-3">Product Description</p>
         <textarea
-          name="description"
+          name="productDescription"
           rows={2}
-          {...register("description")}
+          {...register("productDescription")}
           placeholder="Enter the description of the product"
           className="bg-white text-sm border h-20 border-borderCol resize-none w-full py-1 px-3 rounded-lg outline-none"
         ></textarea>

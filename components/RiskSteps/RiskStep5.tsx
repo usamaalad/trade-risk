@@ -17,7 +17,7 @@ export const RiskStep5 = ({
   setValue,
   watch,
 }: Props) => {
-  const {exporterInfo} = watch();
+  const { exporterInfo } = watch();
   return (
     <div className="py-4 pt-6 px-4 border border-borderCol rounded-lg w-full bg-white">
       <div className="flex items-center gap-x-2 ml-2 mb-3">
@@ -37,7 +37,7 @@ export const RiskStep5 = ({
           <Input
             type="text"
             inputMode="text"
-            name="exporterInfo.beneficiaryName"
+            name="exporterInfo.name"
             register={register}
             value={exporterInfo?.beneficiaryName}
             className="text-sm block bg-none text-end border-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 w-[180px]"

@@ -20,15 +20,7 @@ interface Props {
 export const RiskStep1 = ({ register, watch, setValue }: Props) => {
   const [date, setDate] = useState<Date>();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-  useEffect(() => {
-    const transaction = watch("transaction");
-    if (transaction !== "Outright Sales") {
-      setValue("outrightSales", undefined);
-    } else if (transaction === "Outright Sales" && !watch("outrightSales")) {
-      setValue("outrightSales", "Pre Sales");
-    }
-  }, [watch("transaction"), setValue]);
+  const transactionType = watch("transaction");
 
   return (
     <div className="py-4 pt-6 px-4 border border-borderCol rounded-lg w-full bg-white">
@@ -46,7 +38,7 @@ export const RiskStep1 = ({ register, watch, setValue }: Props) => {
           label="Risk participation"
           name="transaction"
           value="Risk Participation"
-          checked={watch("transaction") === "Risk Participation"}
+          checked={transactionType === "Risk Participation"}
           register={register}
         />
 

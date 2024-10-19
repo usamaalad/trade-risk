@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { DDInput } from "../LCSteps/helpers";
+import { getAllPortData, getPorts } from "@/services/apis/helpers.api";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   register: any;
@@ -18,7 +20,40 @@ export const RiskStep4 = ({
   watch,
 }: Props) => {
   const { importerInfo } = watch();
-  console.log("🚀 ~ importerInfo:", importerInfo);
+  const [ports, setPorts] = React.useState<string[]>([]);
+  const [portCountries, setPortCountries] = useState<string[]>([]);
+
+  const { data: portsData } = useQuery({
+    queryKey: ["port-countries"],
+    queryFn: () => getAllPortData(),
+  });
+
+  useEffect(() => {
+    const fetchPorts = async () => {
+      const { success, response } = await getPorts(
+        importerInfo?.countryOfImport
+      );
+      if (success) setPorts(response[0]?.ports);
+      else setPorts([]);
+    };
+
+    importerInfo?.countryOfImport && fetchPorts();
+  }, [importerInfo?.countryOfImport]);
+
+  useEffect(() => {
+    if (
+      portsData &&
+      portsData.success &&
+      portsData.response &&
+      portsData.response.length > 0
+    ) {
+      const allPortCountries = portsData.response.map((port: any) => {
+        return port.country;
+      });
+      setPortCountries(allPortCountries);
+    }
+  }, [portsData]);
+
   return (
     <div className="py-4 pt-6 px-4 border border-borderCol rounded-lg w-full bg-white">
       <div className="flex items-center gap-x-2 ml-2 mb-3">
@@ -39,7 +74,7 @@ export const RiskStep4 = ({
             type="text"
             value={importerInfo?.applicantName}
             register={register}
-            name="importerInfo.applicantName"
+            name="importerInfo.name"
             className="text-sm block bg-none text-end border-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0 w-[180px]"
             placeholder="Enter name"
           />
@@ -49,18 +84,19 @@ export const RiskStep4 = ({
           label="Country of Import"
           id="importerInfo.countryOfImport"
           value={importerInfo?.countryOfImport}
-          data={countries}
+          data={portCountries}
+          disabled={portCountries.length <= 0}
           setValue={setValue}
           flags={flags}
         />
         <DDInput
           placeholder="Select a port"
           label="Port of Discharge"
-          id="importerInfo.portOfDischarge"
-          value={importerInfo?.countryOfImport}
-          data={countries}
+          id="importerInfo.port"
+          value={importerInfo?.port}
+          disabled={!ports || ports.length === 0}
+          data={ports}
           setValue={setValue}
-          flags={flags}
         />
       </div>
     </div>

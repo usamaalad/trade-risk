@@ -58,6 +58,15 @@ export const AddBanksDialog = ({ setValue, watch }) => {
     setFlags(fetchedFlags);
   }, []);
 
+  // Group banks by country for display purposes
+  const groupedBanks = banksData.reduce((acc: any, bank: Bank) => {
+    if (!acc[bank.country]) {
+      acc[bank.country] = [];
+    }
+    acc[bank.country].push(bank);
+    return acc;
+  }, {});
+
   // Set ISO code based on selected country
   const setCountryCode = (selectedCountry: string) => {
     const country = allCountries.find(
@@ -103,6 +112,7 @@ export const AddBanksDialog = ({ setValue, watch }) => {
   }, [citiesData]);
 
   // Handle adding bank and use setValue from react-hook-form
+  // Handle adding bank and use setValue from react-hook-form
   const handleBankAdd = () => {
     if (!countryVal) return toast.error("Please select a country");
     if (!bankVal) return toast.error("Please select a bank");
@@ -115,31 +125,20 @@ export const AddBanksDialog = ({ setValue, watch }) => {
       city: cityVal,
       swiftCode: swiftCodeVal,
     };
-    console.log(newBank, watch("banks"));
-    const updatedBanksData = {
-      ...banksData,
-      [countryVal]: [...(banksData[countryVal] || []), newBank],
-    };
 
     // Use setValue to update the form's banks field
-    setValue("banks", updatedBanksData);
+    setValue("banks", [...banksData, newBank]);
     setBankVal("");
     setSwiftCodeVal("");
+    setCityVal("");
   };
 
-  const handleBankDelete = (country: string, index: number) => {
-    const updatedCountryBanks = banksData[country].filter(
+  // Handle deleting a bank from the list
+  const handleBankDelete = (index: number) => {
+    const updatedBanksData = banksData.filter(
       (_: any, i: number) => i !== index
     );
-    if (updatedCountryBanks.length === 0) {
-      const { [country]: _, ...restOfCountries } = banksData;
-      setValue("banks", restOfCountries); // Update using setValue
-    } else {
-      setValue("banks", {
-        ...banksData,
-        [country]: updatedCountryBanks,
-      });
-    }
+    setValue("banks", updatedBanksData);
   };
 
   return (
@@ -308,19 +307,19 @@ export const AddBanksDialog = ({ setValue, watch }) => {
           </div>
           {/* Selected Details */}
           <div className="font-roboto col-span-2 border border-borderCol rounded-md h-80 overflow-y-auto w-full grid grid-cols-2 gap-x-4 gap-y-3 px-3 py-3">
-            {Object.keys(banksData).map((country) => (
+            {Object.keys(groupedBanks).map((country) => (
               <div key={country}>
                 <h3 className="font-normal text-[#44444F] w-full border-b border-b-neutral-400 mb-1 capitalize">
                   {country}
                 </h3>
                 <div className="flex flex-col gap-y-2">
-                  {banksData[country].map((bank, idx) => (
+                  {groupedBanks[country].map((bank: Bank, idx: number) => (
                     <div
-                      key={`${bank}-${idx}`}
+                      key={`${bank.name}-${idx}`}
                       className="flex items-start gap-x-2"
                     >
                       <X
-                        onClick={() => handleBankDelete(country, idx)}
+                        onClick={() => handleBankDelete(idx)}
                         className="size-4 text-red-500 cursor-pointer"
                       />
                       <p className="text-[#44444F] text-sm capitalize">

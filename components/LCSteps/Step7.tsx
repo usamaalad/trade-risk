@@ -26,11 +26,11 @@ const FileCard = ({
   onRemoveFile: (name: string) => void;
 }) => {
   return (
-    <div className="flex items-center justify-between gap-x-2 rounded-lg border border-borderCol p-2">
-      <div className="flex w-full items-center gap-x-2">
+    <div className="cursor-pointer flex items-center justify-between gap-x-2 w-full border border-borderCol p-2 rounded-lg p-3">
+      <div className="flex items-center gap-x-2">
         <Button type="button" className="bg-red-200 p-1 hover:bg-red-300">
           <Image
-            src="/images/pdf.png"
+            src="/images/pdf.svg"
             alt="pdf"
             width={500}
             height={500}
@@ -55,7 +55,7 @@ const FileCard = ({
       <Button
         type="button"
         variant="ghost"
-        onClick={() => onRemoveFile(file.userFileName)}
+        onClick={() => onRemoveFile(file.firebaseFileName)}
       >
         <X className="text-lightGray" />
       </Button>

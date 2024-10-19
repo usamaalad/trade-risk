@@ -112,7 +112,6 @@ export const AddBanksDialog = ({ setValue, watch }) => {
   }, [citiesData]);
 
   // Handle adding bank and use setValue from react-hook-form
-  // Handle adding bank and use setValue from react-hook-form
   const handleBankAdd = () => {
     if (!countryVal) return toast.error("Please select a country");
     if (!bankVal) return toast.error("Please select a bank");

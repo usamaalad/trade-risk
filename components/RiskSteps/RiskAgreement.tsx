@@ -3,26 +3,89 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { formatFileSize } from "@/utils";
+import FileUploadService from "@/services/apis/fileUpload.api";
+import { toast } from "sonner";
+import { FileCard } from "../LCSteps/Step7";
 
-export const RiskAgreement = () => {
-  const [selectedFiles, setSelectedFiles] = useState<FileList[] | null>(null);
+interface Props {
+  register: any;
+  watch: any;
+  setValue: any;
+}
+
+export const RiskAgreement = ({ register, watch, setValue }: Props) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files).filter((file) => {
-        return !selectedFiles?.some((fileList) =>
-          Array.from(fileList).some((f) => f.name === file.name)
-        );
-      });
-      setSelectedFiles((prevFiles: any) => [...(prevFiles ?? []), newFiles]);
+    const selectedFile = event.target.files?.[0];
+    console.log(event, "event");
+    if (selectedFile) {
+      // Define allowed MIME types, not just file extensions
+      const allowedFileTypes = [
+        "application/pdf", // PDF
+        "image/jpeg", // JPEG/JPG
+        "image/jpg", // JPG (not always required as image/jpeg covers this)
+        "image/tiff", // TIFF
+        "application/msword", // DOC
+        "image/png",
+      ];
+
+      // Check if the selected file type is allowed
+      if (!allowedFileTypes.includes(selectedFile.type)) {
+        toast.error("File type not allowed. Please select a valid file.");
+        return;
+      }
+
+      // Proceed with the file upload for the valid file
+      FileUploadService.upload(
+        selectedFile,
+        (url, firebaseFileName) => {
+          const newFile = {
+            file: selectedFile,
+            url,
+            userFileName: selectedFile.name, // User's file name for display
+            firebaseFileName, // Firebase's file name for deletion
+            fileSize: selectedFile.size,
+            fileType: selectedFile.type.split("/")[1].toUpperCase(), // Get file type from MIME type
+          };
+
+          setSelectedFile(newFile);
+          setValue("uploadSignedCopy", [
+            {
+              url: newFile.url,
+              userFileName: newFile.userFileName,
+              firebaseFileName: newFile.firebaseFileName,
+              fileSize: newFile.fileSize,
+              fileType: newFile.fileType,
+            },
+          ]);
+        },
+        (error) => {
+          toast.error("Unable to upload file. Please try again.");
+        },
+        (progressBar, progress) => {
+          console.log(progress, "progress");
+          console.log(progressBar, "progressBar");
+        }
+      );
     }
   };
 
-  const handleRemoveFile = (name: string) => {
-    const filterFiles = selectedFiles?.filter((file) => file[0]?.name !== name);
-    setSelectedFiles(filterFiles as FileList[]);
+  const handleRemoveFile = (userFileName: string) => {
+    if (selectedFile && selectedFile.firebaseFileName === userFileName) {
+      FileUploadService.delete(
+        selectedFile.firebaseFileName,
+        () => {
+          setSelectedFile(null);
+          setValue("uploadSignedCopy", []);
+        },
+        (error) => {
+          toast.error("Unable to delete file. Please try again.");
+        }
+      );
+    }
   };
+
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = "/pdf/report.pdf"; // Use the relative path from the public directory
@@ -31,6 +94,7 @@ export const RiskAgreement = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   return (
     <div className="bg-white rounded-lg border border-borderCol py-4 px-4">
       <div className="gap-x-2 w-full">
@@ -70,26 +134,23 @@ export const RiskAgreement = () => {
           />
         </div>
 
-        {selectedFiles?.length > 0 ? (
-          <div className="flex flex-col gap-y-3 mt -5  w-full">
-            {Array.from(selectedFiles).map((fileList, index) => (
-              <FileCard
-                key={fileList[0].name}
-                file={fileList}
-                onRemoveFile={handleRemoveFile}
-              />
-            ))}
+        {selectedFile ? (
+          <div className="flex items-center gap-x-2 h-20 w-full">
+            <FileCard
+              key={selectedFile.userFileName}
+              file={selectedFile}
+              onRemoveFile={handleRemoveFile}
+            />
           </div>
         ) : (
           <label
             htmlFor="attachment-input"
-            className="cursor-pointer w-full flex flex-col justify-center items-center bord er-4 bor der-borderCol border-dotte d py-4 roun ded-md bg- [#F5F7F9]"
+            className="cursor-pointer flex items-center justify-between gap-x-2 w-full p-2 rounded-lg"
           >
             <input
               id="attachment-input"
               type="file"
               onChange={handleFileChange}
-              multiple
               style={{ display: "none" }}
             />
             <div className="flex items-center justify-between gap-x-2 w-full border border-borderCol p-2 rounded-lg">
@@ -119,41 +180,6 @@ export const RiskAgreement = () => {
           </label>
         )}
       </div>
-    </div>
-  );
-};
-
-const FileCard = ({
-  file,
-  onRemoveFile,
-}: {
-  file: FileList;
-  onRemoveFile: (name: string) => void;
-}) => {
-  return (
-    <div className="flex w-full h-[66px] items-center justify-between gap-x-2 border border-borderCol p-2 rounded-lg">
-      <div className="flex items-center gap-x-2 w-full">
-        <Button type="button" className="bg-red-200 p-1 hover:bg-red-300">
-          <Image
-            src="/images/pdf.png"
-            alt="pdf"
-            width={500}
-            height={500}
-            className="size-8"
-          />
-        </Button>
-        <div>
-          <p className="text-lightGray text-sm">{file[0]?.name}</p>
-          <p className="text-[12px] text-para">
-            {file[0]?.type.split("/")[1].toUpperCase()},{" "}
-            {formatFileSize(file[0]?.size)}
-          </p>
-        </div>
-      </div>
-
-      <Button variant="ghost" onClick={() => onRemoveFile(file[0]?.name)}>
-        <X className="text-lightGray" />
-      </Button>
     </div>
   );
 };

@@ -257,7 +257,7 @@ const RiskFundedPage = () => {
           watch={watch}
           setValue={setValue}
         />
-        <RiskAgreement />
+        <RiskAgreement watch={watch} setValue={setValue} />
         <RiskStep1 register={register} watch={watch} setValue={setValue} />
         <RiskStep2 register={register} watch={watch} setValue={setValue} />
 

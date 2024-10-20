@@ -11,6 +11,7 @@ import { DDInput } from "../LCSteps/helpers";
 import { useAuth } from "@/context/AuthProvider";
 import { cn } from "@/lib/utils";
 import { formatFirstLetterOfWord } from "../LG-Output/helper";
+import { baseRatesByCountry } from "@/utils";
 
 export const BidForm = ({
   lcData,
@@ -49,15 +50,22 @@ export const BidForm = ({
   });
 
   useEffect(() => {
-    const country = formatFirstLetterOfWord(user?.business?.accountCountry);
-    if (country && eurozoneCountries.includes(country)) {
-      setBaseRateOptions(baseRatesByCountry.Eurozone);
-    } else if (country && baseRatesByCountry[country]) {
-      setBaseRateOptions(baseRatesByCountry[country]);
-    } else {
-      setBaseRateOptions(["OIS", "REPO", "IBOR"]);
-    }
-  }, [user?.business?.accountCountry]);
+    // Combine all unique base rates for testing purposes
+    const allBaseRates = Array.from(
+      new Set(Object.values(baseRatesByCountry).flat())
+    );
+    setBaseRateOptions(allBaseRates);
+  }, []);
+  // useEffect(() => {
+  //   const country = formatFirstLetterOfWord(user?.business?.accountCountry);
+  //   if (country && eurozoneCountries.includes(country)) {
+  //     setBaseRateOptions(baseRatesByCountry.Eurozone);
+  //   } else if (country && baseRatesByCountry[country]) {
+  //     setBaseRateOptions(baseRatesByCountry[country]);
+  //   } else {
+  //     setBaseRateOptions(["OIS", "REPO", "IBOR"]);
+  //   }
+  // }, [user?.business?.accountCountry]);
 
   const onSubmit: SubmitHandler<typeof addBidTypes> = async (data) => {
     if (isDiscount && !discountBaseRate)

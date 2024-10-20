@@ -203,7 +203,6 @@ const SliderCard = ({
 const RequestCard = ({
   isBank,
   isRisk,
-  riskType,
   data,
 }: {
   isBank: boolean;
@@ -261,27 +260,31 @@ const RequestCard = ({
   };
 
   const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 1,
+    },
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
       items: 1,
     },
     tablet: {
-      breakpoint: { max: 1024, min: 464 },
+      breakpoint: { max: 1024, min: 600 },
       items: 1,
     },
     mobile: {
-      breakpoint: { max: 464, min: 0 },
+      breakpoint: { max: 600, min: 0 },
       items: 1,
     },
   };
 
   return (
     <>
-      {isBank && riskType !== "myRisk" && !isBidsExpiredForBank ? (
+      {isBank && !isBidsExpiredForBank ? (
         showData &&
         data.status !== "Expired" &&
         data.status !== "Accepted" &&
-        (data.status == "Add Bid" || data.status !== "Pending") && (
+        (data.status === "Add Bid" || data.status !== "Pending") && (
           <>
             <div className="px-3 py-2 flex flex-col gap-y-1 bg-[#F5F7F9] rounded-md">
               {/* Data */}
@@ -350,8 +353,8 @@ const RequestCard = ({
             </div>
           </>
         )
-      ) : (
-        <div className="flex flex-col gap-y-1 bg-[#F5F7F9] rounded-md">
+      ) : !isBank ? (
+        <div className="gap-y-1 bg-[#F5F7F9] rounded-md">
           {/* Data */}
           <div className="px-3 pt-2">
             <div className="flex items-center justify-between">
@@ -422,9 +425,7 @@ const RequestCard = ({
               </p>
             </div>
           </div>
-
-          {/* Slider cards*/}
-          <div className="w-full">
+          <div className="w-full max-w-[250px] overflow-hidden">
             <Carousel
               responsive={responsive}
               autoPlay={false}
@@ -434,6 +435,7 @@ const RequestCard = ({
               showDots={false}
               afterChange={handleAfterChange}
               itemClass="px-2.5"
+              containerClass="w-full overflow-hidden" // Make sure the carousel container respects the width
             >
               {data.bids.map((info: IBids) => (
                 <SliderCard
@@ -446,7 +448,7 @@ const RequestCard = ({
             </Carousel>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 };
@@ -454,8 +456,6 @@ const RequestCard = ({
 export const Sidebar = ({
   isBank,
   createMode,
-  isRisk = false,
-  riskType,
 }: {
   isBank: boolean;
   createMode?: boolean;
@@ -500,7 +500,7 @@ export const Sidebar = ({
     data?.forEach((item: any) => extractHeaders(item));
     return Array.from(headers);
   };
-
+  console.log(allLcs, "allLcs");
   const formatValue = (header: any, obj: any) => {
     const keys = header.split(".");
     let value = obj;

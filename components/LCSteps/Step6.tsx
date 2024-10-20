@@ -90,17 +90,23 @@ export const Step6 = ({
       ? setValue("discountingInfo.pricePerAnnum", `${newValue}%`)
       : setValue("confirmationInfo.pricePerAnnum", `${newValue}%`);
   };
-
   useEffect(() => {
-    const country = formatFirstLetterOfWord(user?.business?.accountCountry);
-    if (country && eurozoneCountries.includes(country)) {
-      setBaseRateOptions(baseRatesByCountry.Eurozone);
-    } else if (country && baseRatesByCountry[country]) {
-      setBaseRateOptions(baseRatesByCountry[country]);
-    } else {
-      setBaseRateOptions(["OIS", "REPO", "IBOR"]);
-    }
-  }, [user?.business?.accountCountry]);
+    // Combine all unique base rates for testing purposes
+    const allBaseRates = Array.from(
+      new Set(Object.values(baseRatesByCountry).flat())
+    );
+    setBaseRateOptions(allBaseRates);
+  }, []);
+  // useEffect(() => {
+  //   const country = formatFirstLetterOfWord(user?.business?.accountCountry);
+  //   if (country && eurozoneCountries.includes(country)) {
+  //     setBaseRateOptions(baseRatesByCountry.Eurozone);
+  //   } else if (country && baseRatesByCountry[country]) {
+  //     setBaseRateOptions(baseRatesByCountry[country]);
+  //   } else {
+  //     setBaseRateOptions(["OIS", "REPO", "IBOR"]);
+  //   }
+  // }, [user?.business?.accountCountry]);
 
   return (
     <div

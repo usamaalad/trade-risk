@@ -91,9 +91,13 @@ export const Step6 = ({
       : setValue("confirmationInfo.pricePerAnnum", `${newValue}%`);
   };
   useEffect(() => {
-    // Combine all unique base rates for testing purposes
+    // Combine all unique base rates for testing purposes with country labels
     const allBaseRates = Array.from(
-      new Set(Object.values(baseRatesByCountry).flat())
+      new Set(
+        Object.entries(baseRatesByCountry).flatMap(([country, rates]) =>
+          rates.map((rate) => `${rate} (${country.toUpperCase()})`)
+        )
+      )
     );
     setBaseRateOptions(allBaseRates);
   }, []);

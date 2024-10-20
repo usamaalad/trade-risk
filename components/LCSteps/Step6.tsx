@@ -111,7 +111,6 @@ export const Step6 = ({
   //     setBaseRateOptions(["OIS", "REPO", "IBOR"]);
   //   }
   // }, [user?.business?.accountCountry]);
-
   return (
     <div
       id="step6"

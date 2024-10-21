@@ -51,7 +51,7 @@ const HomePage = ({ searchParams }: SearchParams) => {
           <h2 className="mb-5 text-4xl font-semibold capitalize">Welcome</h2>
           {/* Charts */}
           <div className="mb-4 flex h-fit w-[80vw] flex-col gap-x-3 gap-y-4 xl:flex-row 2xl:w-full">
-            <ProgressCharts title="My Actions" />
+            <ProgressCharts title="Transactions Overview" />
             <LineCharts />
           </div>
           <RequestTable data={data} key={"Corporate"} isLoading={isLoading} />

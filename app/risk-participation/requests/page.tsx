@@ -2,6 +2,7 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { BankTable } from "@/components/shared/BankTable";
 import { RequestTable } from "@/components/shared/RequestTable";
+import { RiskParticipationTable } from "@/components/shared/RiskParticipationTable";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { useAuth } from "@/context/AuthProvider";
 import { fetchRisk } from "@/services/apis/risk.api";
@@ -35,9 +36,8 @@ const RiskRequestPage = ({ searchParams }: Props) => {
       queryFn: () =>
         fetchRisk({
           draft: false,
-          createdBy: false,
           page: page,
-          limit: 7,
+          limit: 10,
         }),
       enabled: !!user?._id,
     });
@@ -74,7 +74,7 @@ const RiskRequestPage = ({ searchParams }: Props) => {
                 )}
               </div>
             </div>
-            <RequestTable data={data} isLoading={isLoading} isRisk={true} />
+            <RiskParticipationTable data={data} isLoading={isLoading} />
           </div>
         </div>
 

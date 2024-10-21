@@ -40,8 +40,8 @@ const CorporateBidsPage = ({ searchParams }: SearchParams) => {
         label: "LG Issuance within the country",
       },
       {
-        id: "LG Reissuance in another country",
-        label: "LG Reissuance in another country",
+        id: "LG Re-issuance in another country",
+        label: "LG Re-issuance in another country",
       },
     ],
     lc: [

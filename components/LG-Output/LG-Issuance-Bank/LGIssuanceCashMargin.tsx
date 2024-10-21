@@ -296,7 +296,7 @@ const LGIssuanceCashMarginDialog = ({ data }: { data: any }) => {
 
     const submissionData = {
       confirmationPrice: confirmationPrice,
-      bidType: "LG Issuance",
+      bidType: "LG 100% Cash Margin",
       lc: data._id,
       bidValidity: formData.bidValidity,
       attachments: files,

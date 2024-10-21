@@ -283,7 +283,7 @@ const LGIssuanceDialog = ({ data }: { data: any }) => {
         setGroupedBids(Object.values(groupedBidsWithBankData));
 
         const requestData = {
-          bidType: "LG Issuance",
+          bidType: "LG Re-issuance in another country",
           bidValidity: bidValidity,
           lc: data._id,
           bids: newBids,

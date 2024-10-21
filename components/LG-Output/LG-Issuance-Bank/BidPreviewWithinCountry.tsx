@@ -38,7 +38,7 @@ export const BidPreviewWithinCountry: React.FC<BidPreviewProps> = ({
 
   const handleConfirmSubmit = () => {
     const bidData = {
-      bidType: "LG Issuance",
+      bidType: "LG Issuance within the country",
       bidValidity: selectedBidValidity || bidValidityDate,
       issueLg: {
         branchAddress: formData.issueLg.branchAddress,

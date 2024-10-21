@@ -13,12 +13,28 @@ export const fetchRisk = async ({
   limit?: number;
 }) => {
   try {
-    const { data } = await api.get(
-      `/risk?createdBy=${createdBy}&draft=${
-        draft || false
-      }&page=${page}&limit=${limit}`
-    );
+    const { data } = await api.get(`/risk/?page=${page}&limit=${limit}`);
+    return data.data;
+  } catch (error: any) {
+    console.log(error);
+    return error.response?.data?.message || "Something went wrong";
+  }
+};
 
+export const fetchMyRisk = async ({
+  draft,
+  page,
+  limit,
+}: {
+  draft?: boolean;
+  createdBy?: boolean;
+  page?: number;
+  limit?: number;
+}) => {
+  try {
+    const { data } = await api.get(
+      `/risk/fetch-my-risks?page=${page}&draft=${draft || false}&limit=${limit}`
+    );
     return data.data;
   } catch (error: any) {
     console.log(error);

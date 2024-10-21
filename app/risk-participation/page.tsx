@@ -2,9 +2,10 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { BankTable } from "@/components/shared/BankTable";
 import { RequestTable } from "@/components/shared/RequestTable";
+import { RiskParticipationTable } from "@/components/shared/RiskParticipationTable";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { useAuth } from "@/context/AuthProvider";
-import { fetchRisk } from "@/services/apis/risk.api";
+import { fetchMyRisk, fetchRisk } from "@/services/apis/risk.api";
 import { ApiResponse, IRisk } from "@/types/type";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -33,9 +34,8 @@ const RiskParticipationPage = ({ searchParams }: Props) => {
     useQuery({
       queryKey: ["fetch-risks", page, limit, search, filter],
       queryFn: () =>
-        fetchRisk({
+        fetchMyRisk({
           draft: false,
-          createdBy: true,
           page: page,
           limit: 7,
         }),
@@ -74,7 +74,7 @@ const RiskParticipationPage = ({ searchParams }: Props) => {
                 )}
               </div>
             </div>
-            <RequestTable data={data} isLoading={isLoading} isRisk={true} />
+            <RiskParticipationTable data={data} isLoading={isLoading} />
           </div>
         </div>
 

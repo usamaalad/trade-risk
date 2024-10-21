@@ -25,6 +25,7 @@ import { AddBid } from "./AddBid";
 import io from "socket.io-client";
 import { useAuth } from "@/context/AuthProvider";
 import { LGIssuanceWithinCountryCorporate } from "../LG-Output/LG-Issuance-Corporate/LgIssuanceWithinCountryCorporate";
+import { RiskParticipationAddBid } from "./RiskParticipationAddBid";
 
 export const gridCellStyling = {
   border: "1px solid rgba(224, 224, 224, 1)",
@@ -43,7 +44,7 @@ let formattedBaseUrl = BASE_URL?.endsWith("api")
 formattedBaseUrl =
   BASE_URL === undefined ? "https://trade.yameenyousuf.com" : BASE_URL;
 
-export const RequestTable = ({
+export const RiskParticipationTable = ({
   data,
   isLoading,
 }: {
@@ -90,61 +91,61 @@ export const RequestTable = ({
     return country ? country.flag : undefined;
   };
 
-  useEffect(() => {
-    const socket = io(formattedBaseUrl, {
-      transportOptions: {
-        polling: {
-          extraHeaders: {
-            business: user?.business?._id, // Pass the businessId in headers
-            type: isBank ? "bank" : "corporate", // Pass the type in headers
-          },
-        },
-      },
-    });
+  // useEffect(() => {
+  //   const socket = io(formattedBaseUrl, {
+  //     transportOptions: {
+  //       polling: {
+  //         extraHeaders: {
+  //           business: user?.business?._id, // Pass the businessId in headers
+  //           type: isBank ? "bank" : "corporate", // Pass the type in headers
+  //         },
+  //       },
+  //     },
+  //   });
 
-    if (isBank) {
-      socket.on("lc-created", (newLcData) => {
-        setTableData((prevTableData) => {
-          const updatedData = Array.isArray(prevTableData?.data)
-            ? [newLcData, ...prevTableData.data].slice(0, 10)
-            : [newLcData];
+  //   if (isBank) {
+  //     socket.on("lc-created", (newLcData) => {
+  //       setTableData((prevTableData) => {
+  //         const updatedData = Array.isArray(prevTableData?.data)
+  //           ? [newLcData, ...prevTableData.data].slice(0, 10)
+  //           : [newLcData];
 
-          return {
-            ...prevTableData,
-            data: updatedData,
-          };
-        });
-      });
-    }
+  //         return {
+  //           ...prevTableData,
+  //           data: updatedData,
+  //         };
+  //       });
+  //     });
+  //   }
 
-    if (!isBank) {
-      socket.on("bid-created", (newBidData) => {
-        setTableData((prevTableData) => {
-          const updatedData = Array.isArray(prevTableData?.data)
-            ? prevTableData.data
-            : [];
+  //   if (!isBank) {
+  //     socket.on("bid-created", (newBidData) => {
+  //       setTableData((prevTableData) => {
+  //         const updatedData = Array.isArray(prevTableData?.data)
+  //           ? prevTableData.data
+  //           : [];
 
-          const newTableData = updatedData.map((item) =>
-            item._id === newBidData.lc
-              ? {
-                  ...item,
-                  bids: [...(item.bids || []), newBidData],
-                }
-              : item
-          );
+  //         const newTableData = updatedData.map((item) =>
+  //           item._id === newBidData.lc
+  //             ? {
+  //                 ...item,
+  //                 bids: [...(item.bids || []), newBidData],
+  //               }
+  //             : item
+  //         );
 
-          return {
-            ...prevTableData,
-            data: newTableData,
-          };
-        });
-      });
-    }
+  //         return {
+  //           ...prevTableData,
+  //           data: newTableData,
+  //         };
+  //       });
+  //     });
+  //   }
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [formattedBaseUrl, user?.business?._id]);
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [formattedBaseUrl, user?.business?._id]);
 
   const columns = [
     { field: "id", headerName: "ID", width: 200 },
@@ -178,14 +179,11 @@ export const RequestTable = ({
       minWidth: 140,
       sortable: true,
       hideSortIcons: true,
-      valueGetter: (params, row) =>
-        new Date(row.period?.startDate || row.startDate || row.createdAt),
+      valueGetter: (params, row) => new Date(row.createdAt),
       align: "center",
       renderHeader: () => (
         <div className="flex items-center justify-between">
-          <span className="font-bold text-[#44444F]">
-            {isBank ? "Deal Received" : "Request On"}
-          </span>
+          <span className="font-bold text-[#44444F]">{"Deal Received"}</span>
           <div className="border border-primaryCol center rounded-full size-4 hover:bg-primaryCol hover:text-white transition-colors duration-100 cursor-pointer mx-2">
             <ChevronUp className="size-3" />
           </div>
@@ -195,12 +193,8 @@ export const RequestTable = ({
         const item = params.row;
         return (
           <div style={gridCellStyling}>
-            {item?.period?.startDate
-              ? convertDateToString(item?.period?.startDate)
-              : item?.startDate
-              ? convertDateToString((item as IRisk)?.startDate)
-              : (item as IRisk)?.createdAt &&
-                convertDateToString(new Date((item as IRisk)?.createdAt))}
+            {(item as IRisk)?.createdAt &&
+              convertDateToString(new Date((item as IRisk)?.createdAt))}
           </div>
         );
       },
@@ -213,9 +207,7 @@ export const RequestTable = ({
       hideSortIcons: true,
       align: "center",
       valueGetter: (params, row) =>
-        new Date(
-          row.period?.endDate || row.expiryDate || row.lastDateOfReceivingBids
-        ),
+        new Date(row.lcPeriod.lcExpiry || row.lastDateOfReceivingBids),
       renderHeader: () => (
         <div className="flex items-center justify-between">
           <span className="font-bold text-[#44444F]">Expires On</span>
@@ -228,45 +220,11 @@ export const RequestTable = ({
         const item = params.row;
         return (
           <div style={gridCellStyling}>
-            {item?.period?.endDate
-              ? convertDateToString(item?.period?.endDate)
-              : item?.expiryDate
-              ? convertDateToString((item as IRisk)?.lastDateOfReceivingBids)
+            {item?.lcPeriod?.lcExpiry
+              ? convertDateToString((item as IRisk)?.lcPeriod.lcExpiry)
               : item?.lastDateOfReceivingBids
               ? convertDateToString(item?.lastDateOfReceivingBids)
               : "-"}
-          </div>
-        );
-      },
-    },
-    {
-      field: "type",
-      flex: 1,
-      minWidth: 170,
-      sortable: true,
-      disableColumnMenu: true,
-      align: "center",
-      hideSortIcons: true,
-      valueGetter: (value, row) =>
-        row?.type === "LG Issuance"
-          ? row?.lgIssuance
-          : row?.type || (row as IRisk)?.riskParticipationTransaction?.type,
-      renderHeader: () => (
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-[#44444F]">Product Type</span>
-          <div className="border border-primaryCol center rounded-full size-4 hover:bg-primaryCol hover:text-white transition-colors duration-100 cursor-pointer mx-2">
-            <ChevronUp className="size-3" />
-          </div>
-        </div>
-      ),
-      renderCell: (params) => {
-        const item = params.row;
-        return (
-          <div style={gridCellStyling}>
-            {item?.type === "LG Issuance"
-              ? item?.lgIssuance
-              : item?.type ||
-                (item as IRisk)?.riskParticipationTransaction?.type}
           </div>
         );
       },
@@ -279,7 +237,7 @@ export const RequestTable = ({
       sortable: false,
       align: "center",
       renderCell: (params) => {
-        const item = params.row.issuingBanks?.[0];
+        const item = params.row.banks?.[0];
         const flag = getCountryFlagByName(item?.country);
         return (
           <div className="space-x-1" style={gridCellStyling}>
@@ -305,10 +263,8 @@ export const RequestTable = ({
         const item = params.row;
         return (
           <div style={gridCellStyling}>
-            {(item.exporterInfo &&
-              formatFirstLetterOfWord(item.exporterInfo?.beneficiaryName)) ||
-              formatFirstLetterOfWord(item?.beneficiaryDetails?.name) ||
-              ""}
+            {item.exporterInfo &&
+              formatFirstLetterOfWord(item.exporterInfo?.name)}
           </div>
         );
       },
@@ -325,11 +281,8 @@ export const RequestTable = ({
         const item = params.row;
         return (
           <div style={gridCellStyling}>
-            {((item.importerInfo &&
-              formatFirstLetterOfWord(item.importerInfo?.applicantName)) ||
-              formatFirstLetterOfWord(item?.applicantDetails?.name) ||
-              formatFirstLetterOfWord(item?.applicantDetails?.company)) ??
-              "-"}
+            {item.importerInfo &&
+              formatFirstLetterOfWord(item.importerInfo?.name)}
           </div>
         );
       },
@@ -351,19 +304,39 @@ export const RequestTable = ({
         </div>
       ),
       renderCell: (params) => {
-        const item = params.row;
-        const currency = item?.currency
-          ? item.currency.toUpperCase()
-          : item?.lgDetails?.currency || item?.totalContractCurrency || "USD";
+        const item = params.row.riskParticipationTransaction;
+        const currency = item?.currency && item.currency.toUpperCase();
         return (
           <div style={gridCellStyling}>
-            {item.type === "LG Issuance"
-              ? item.lgIssuance === "LG 100% Cash Margin"
-                ? `${currency} ${formatAmount(item?.lgDetails?.amount)}`
-                : `${currency} ${formatAmount(getLgBondTotal(item))}`
-              : item?.amount
-              ? `${currency} ${formatAmount(item?.amount?.price)}`
-              : `${currency} ${formatAmount(item?.amount)}`}
+            {`${currency} ${formatAmount(item?.amount)}`}
+          </div>
+        );
+      },
+    },
+    {
+      field: "participationValue",
+      flex: 1,
+      minWidth: 220,
+      sortable: true,
+      hideSortIcons: true,
+      disableColumnMenu: true,
+      align: "center",
+      renderHeader: () => (
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-[#44444F] text-[14px]">
+            Participation Amount
+          </span>
+          <div className="border border-primaryCol center rounded-full size-4 hover:bg-primaryCol hover:text-white transition-colors duration-100 cursor-pointer mx-2">
+            <ChevronUp className="size-4" />
+          </div>
+        </div>
+      ),
+      renderCell: (params) => {
+        const item = params.row.riskParticipationTransaction;
+        const currency = item?.currency && item.currency.toUpperCase();
+        return (
+          <div style={gridCellStyling}>
+            {`${currency} ${formatAmount(item?.participationValue)}`}
           </div>
         );
       },
@@ -396,7 +369,7 @@ export const RequestTable = ({
                 <span className="font-bold">{item.bids?.length || 0} bids</span>
               )
             ) : (
-              <AddBid lcData={item} />
+              <RiskParticipationAddBid riskData={item} />
             )}
           </div>
         );
@@ -444,17 +417,8 @@ export const RequestTable = ({
       className="p-5 rounded-lg border border-[#E2E2EA]"
     >
       <div className="mb-4 flex w-full items-center justify-between gap-x-2">
-        <h2 className="text-[16px] font-semibold text-[#1A1A26]">
-          {isBank ? "Deals Received by Corporates" : "Transaction Requests"}
-        </h2>
-
         <div className="flex items-center gap-x-2">
-          {isBank && (
-            <>
-              <ProductFilter isRisk={false} />
-              <BidsCountrySelect />
-            </>
-          )}
+          <BidsCountrySelect />
           <DateRangePicker />
           <SearchBar />
           <div className="flex items-center gap-x-2">

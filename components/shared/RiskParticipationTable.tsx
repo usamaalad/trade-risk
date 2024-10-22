@@ -26,6 +26,8 @@ import io from "socket.io-client";
 import { useAuth } from "@/context/AuthProvider";
 import { LGIssuanceWithinCountryCorporate } from "../LG-Output/LG-Issuance-Corporate/LgIssuanceWithinCountryCorporate";
 import { RiskParticipationAddBid } from "./RiskParticipationAddBid";
+import { usePathname, useRouter } from "next/navigation";
+import { RiskParticipationTableDialog } from "./RiskParticipationTableDialog";
 
 export const gridCellStyling = {
   border: "1px solid rgba(224, 224, 224, 1)",
@@ -53,6 +55,8 @@ export const RiskParticipationTable = ({
 }) => {
   const { user } = useAuth();
   const isBank = user?.type === "bank";
+  const pathname = usePathname();
+  const isMyRisks = pathname === "/risk-participation";
   const [allCountries, setAllCountries] = useState<Country[]>([]);
   const [tableData, setTableData] = useState<any>([]);
   const [search, setSearch] = useState("");
@@ -362,7 +366,7 @@ export const RiskParticipationTable = ({
         const item = params.row;
         return (
           <div style={isBank ? undefined : gridCellStyling}>
-            {!isBank ? (
+            {isMyRisks ? (
               item.bids?.length === 1 ? (
                 <span className="font-bold">1 bid</span>
               ) : (
@@ -390,20 +394,16 @@ export const RiskParticipationTable = ({
         const originalItem = params.row;
         return (
           <ButtonBase>
-            {isBank ? (
-              <AddBid lcData={originalItem} isEyeIcon={true} />
-            ) : originalItem.type == "LG Issuance" &&
-              originalItem.lgIssuance ===
-                "LG Re-issuance in another country" ? (
-              <LGTableBidStatus data={originalItem} />
-            ) : originalItem.type == "LG Issuance" &&
-              originalItem.lgIssuance === "LG issuance within the country" ? (
-              <LGIssuanceWithinCountryCorporate data={originalItem} />
-            ) : originalItem.type == "LG Issuance" &&
-              originalItem.lgIssuance === "LG 100% Cash Margin" ? (
-              <LGCashMarginCorporate data={originalItem} />
+            {!isMyRisks ? (
+              <RiskParticipationAddBid
+                riskData={originalItem}
+                isEyeIcon={true}
+              />
             ) : (
-              <TableDialog lcData={originalItem} id={originalItem._id} />
+              <RiskParticipationTableDialog
+                riskData={originalItem}
+                id={originalItem._id}
+              />
             )}
           </ButtonBase>
         );

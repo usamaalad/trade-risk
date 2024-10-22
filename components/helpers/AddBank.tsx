@@ -164,6 +164,54 @@ export default function AddBank() {
         </PopoverContent>
       </Popover>
       {/* bank */}
+      <Popover open={cityOpen} onOpenChange={setCityOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={cityOpen}
+            className="capitalize font-roboto w-full justify-between font-normal py-3"
+            disabled={countryVal === ""}
+          >
+            {cityVal ? cityVal : countryVal ? "city" : "city"}
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[600px] p-0">
+          <Command className="font-roboto">
+            <CommandInput placeholder="Search city..." />
+            <CommandEmpty>No city found.</CommandEmpty>
+            <CommandGroup className="max-h-[300px] overflow-y-auto">
+              {cities &&
+                cities.length > 0 &&
+                cities.map((city: string) => (
+                  <CommandItem
+                    key={city}
+                    value={city}
+                    onSelect={(currentValue) => {
+                      setCityVal(
+                        currentValue.toLowerCase() === cityVal.toLowerCase()
+                          ? ""
+                          : currentValue
+                      );
+                      setCityOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        city.toLowerCase() === cityVal.toLowerCase()
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                    {city}
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
       <Popover open={bankOpen} onOpenChange={setBankOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -211,54 +259,6 @@ export default function AddBank() {
                       )}
                     />
                     {bank}
-                  </CommandItem>
-                ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      <Popover open={cityOpen} onOpenChange={setCityOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={cityOpen}
-            className="capitalize font-roboto w-full justify-between font-normal py-3"
-            disabled={countryVal === ""}
-          >
-            {cityVal ? cityVal : countryVal ? "city" : "city"}
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[600px] p-0">
-          <Command className="font-roboto">
-            <CommandInput placeholder="Search city..." />
-            <CommandEmpty>No city found.</CommandEmpty>
-            <CommandGroup className="max-h-[300px] overflow-y-auto">
-              {cities &&
-                cities.length > 0 &&
-                cities.map((city: string) => (
-                  <CommandItem
-                    key={city}
-                    value={city}
-                    onSelect={(currentValue) => {
-                      setCityVal(
-                        currentValue.toLowerCase() === cityVal.toLowerCase()
-                          ? ""
-                          : currentValue
-                      );
-                      setCityOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        city.toLowerCase() === cityVal.toLowerCase()
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {city}
                   </CommandItem>
                 ))}
             </CommandGroup>

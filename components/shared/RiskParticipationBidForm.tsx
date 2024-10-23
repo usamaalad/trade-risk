@@ -83,7 +83,7 @@ export const RiskParticipationBidForm = ({
             before:
               riskData?.lcPeriod?.date &&
               new Date(riskData?.lcPeriod?.date) > new Date()
-                ? new Date(riskData.period.startDate)
+                ? new Date(riskData?.lcPeriod?.date)
                 : new Date(),
             after: new Date(riskData?.lcPeriod?.lcExpiry),
           }}

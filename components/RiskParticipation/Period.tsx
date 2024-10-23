@@ -8,7 +8,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { ValidatingCalendar } from "../LCSteps/Step3Helpers";
-
 export default function Period({
   watch,
   setValue,
@@ -127,7 +126,7 @@ export default function Period({
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
-            className={`w-fit justify-start text-left font-normal border-none ${
+            className={`mr-0 pr-0 w-fit justify-start text-left font-normal border-none ${
               dateValue ? "text-black" : "text-[#B5B5BE]"
             }`}
             id="period-lc-date"
@@ -148,11 +147,18 @@ export default function Period({
               updateValue(dateFieldName, date);
               setStartDate(date);
             }}
+            disabled={{
+              before:
+                dateTypeNormalized === "no" ||
+                dateTypeNormalized === "Expected date of LC issuance" ||
+                (dateTypeNormalized === "Expected date to confirm" &&
+                  new Date()),
+              after:
+                dateTypeNormalized === "yes" ||
+                dateTypeNormalized === "Date LC issued" ||
+                (dateTypeNormalized === "Date LC confirmed" && new Date()),
+            }}
             onClose={() => setDatePopoverOpen(false)}
-            isPast={
-              dateTypeNormalized === "yes" ||
-              dateTypeNormalized === "Date LC issued"
-            }
           />
         </PopoverContent>
       </Popover>

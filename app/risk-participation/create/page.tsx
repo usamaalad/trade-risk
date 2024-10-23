@@ -101,25 +101,29 @@ const RiskFundedPage = () => {
     isDraft
   ) => {
     let extraInfoObj;
-    console.log(data, "data");
+
     if (
       data.paymentTerms &&
       data.paymentTerms !== "Sight LC" &&
       data.extraInfo
     ) {
-      console.log("something");
       extraInfoObj = { days: days, other: data.extraInfo.other };
     }
 
     const preparedData = {
       ...data,
+      riskParticipationTransaction: {
+        ...data.riskParticipationTransaction,
+        currency: data.riskParticipationTransaction?.currency ?? "USD",
+        participationCurrency:
+          data.riskParticipationTransaction?.participationCurrency ?? "USD",
+      },
     };
 
     try {
       const validationResult = await generalRiskSchema.validate(preparedData, {
         abortEarly: false,
       });
-      console.log(validationResult, "validation");
 
       const reqData = {
         ...validationResult,

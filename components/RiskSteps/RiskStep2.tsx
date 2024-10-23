@@ -29,7 +29,6 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
   const [currencyValue, setCurrencyValue] = useState<string | number>("");
   const [rawValue, setRawValue] = useState("");
   const [percentageValue, setPercentageValue] = useState<string | number>("");
-
   const riskParticipation = watch("riskParticipation");
   const amount = watch("riskParticipationTransaction.amount");
   const transactionType = watch("transactionType");
@@ -37,15 +36,11 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
     "riskParticipationTransaction.isParticipationOffered",
     false
   );
-  const pricingOffered = watch("riskParticipationTransaction.pricing");
-  const [pricingOfferedValue, setPricingOfferedValue] = useState<number>(
-    parseFloat(pricingOffered) || 0
+  const [pricingOffered, setPricingOffered] = useState<string>(
+    `${parseFloat(
+      watch("riskParticipationTransaction.pricingOffered") || 0
+    ).toFixed(2)}%`
   );
-
-  // Sync state with watch value on component load or pricingOffered change
-  useEffect(() => {
-    setPricingOfferedValue(parseFloat(pricingOffered) || 0);
-  }, [pricingOffered]);
 
   const handleChange = (e: any) => {
     const { value } = e.target;
@@ -83,18 +78,29 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
   };
 
   const handleIncrement = () => {
-    const newValue = (pricingOfferedValue + 0.5).toFixed(1);
-    if (parseFloat(newValue) <= 100) {
-      setPricingOfferedValue(parseFloat(newValue));
-      setValue("riskParticipationTransaction.pricingOffered", newValue);
+    // Remove % sign and parse as a number
+    const currentValue = parseFloat(pricingOffered.replace("%", "")) || 0;
+    const newValue = currentValue + 0.5;
+    if (newValue <= 100) {
+      const newFormattedValue = `${newValue.toFixed(2)}%`;
+      setPricingOffered(newFormattedValue);
+      setValue(
+        "riskParticipationTransaction.pricingOffered",
+        newValue.toFixed(2)
+      );
     }
   };
 
   const handleDecrement = () => {
-    const newValue = (pricingOfferedValue - 0.5).toFixed(1);
-    if (parseFloat(newValue) >= 0) {
-      setPricingOfferedValue(parseFloat(newValue));
-      setValue("riskParticipationTransaction.pricingOffered", newValue);
+    const currentValue = parseFloat(pricingOffered.replace("%", "")) || 0;
+    const newValue = currentValue - 0.5;
+    if (newValue >= 0) {
+      const newFormattedValue = `${newValue.toFixed(2)}%`;
+      setPricingOffered(newFormattedValue);
+      setValue(
+        "riskParticipationTransaction.pricingOffered",
+        newValue.toFixed(2)
+      );
     }
   };
 
@@ -269,18 +275,20 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                 <p className="font-semibold text-sm text-lightGray mb-2 ml-2">
                   % participation offered
                 </p>
-                <CheckBoxInput
-                  checked={isParticipationOffered}
-                  label="Maximum 90% can be offered as per MRPA"
-                  register={register}
-                  id="isParticipationOffered"
-                  onChange={() => {
-                    setValue(
-                      "riskParticipationTransaction.isParticipationOffered",
-                      !isParticipationOffered
-                    );
-                  }}
-                />
+                <div className="h-12 items-center justify-center">
+                  <CheckBoxInput
+                    checked={isParticipationOffered}
+                    label="Maximum 90% can be offered as per MRPA"
+                    register={register}
+                    id="isParticipationOffered"
+                    onChange={() => {
+                      setValue(
+                        "riskParticipationTransaction.isParticipationOffered",
+                        !isParticipationOffered
+                      );
+                    }}
+                  />
+                </div>
               </div>
               <div className="flex items-center">
                 <input
@@ -346,6 +354,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                   inputMode="numeric"
                   required
                   max={100}
+                  value={pricingOffered}
                   {...register("riskParticipationTransaction.pricingOffered")}
                   className="w-fit items-center justify-center border-none bg-transparent text-sm text-lightGray flex self-center text-center w-8"
                   onKeyUp={(event: any) => {

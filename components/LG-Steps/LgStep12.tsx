@@ -17,6 +17,7 @@ const LgStep12: React.FC<LgStepsProps10> = ({
   const lastDateOfReceivingBids = watch("lastDateOfReceivingBids");
   const lcEndDate = watch("period.endDate");
   const lcStartDate = watch("period.startDate");
+  const riskStartDate = watch("lcPeriod.date");
   // Watch for the lgExpiryDate values of each bond
   const bidBondExpiryDate = watch("bidBond.lgExpiryDate");
   const performanceBondExpiryDate = watch("performanceBond.lgExpiryDate");
@@ -32,6 +33,7 @@ const LgStep12: React.FC<LgStepsProps10> = ({
   );
   const lgCashMarginExpectedDate = watch("lgDetails.expectedDateToIssueLg");
   const lgCashMarginExpiryDate = watch("lgDetails.lgExpiryDate");
+  const riskExpiry = watch("lcPeriod.lcExpiry");
 
   // Utility to find the latest (maximum) date
   const findMaxDate = (...dates: (string | Date | undefined)[]) => {
@@ -59,7 +61,8 @@ const LgStep12: React.FC<LgStepsProps10> = ({
     retentionMoneyBondExpiryDate,
     advancePaymentBondExpiryDate,
     lgCashMarginExpiryDate,
-    lcEndDate
+    lcEndDate,
+    riskExpiry
   );
   const minLgExpectedDate = findMinDate(
     bidBondExpectedDate,
@@ -67,7 +70,8 @@ const LgStep12: React.FC<LgStepsProps10> = ({
     retentionMoneyBondExpectedDate,
     advancePaymentBondExpectedDate,
     lgCashMarginExpectedDate,
-    lcStartDate
+    lcStartDate,
+    riskStartDate
   );
   return (
     <div

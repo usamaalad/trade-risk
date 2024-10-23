@@ -211,7 +211,7 @@ export const RiskParticipationTable = ({
       hideSortIcons: true,
       align: "center",
       valueGetter: (params, row) =>
-        new Date(row.lcPeriod.lcExpiry || row.lastDateOfReceivingBids),
+        new Date(row.lcPeriod?.lcExpiry || row.lastDateOfReceivingBids),
       renderHeader: () => (
         <div className="flex items-center justify-between">
           <span className="font-bold text-[#44444F]">Expires On</span>

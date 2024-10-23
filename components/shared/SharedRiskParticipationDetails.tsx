@@ -15,7 +15,7 @@ const SharedRiskParticipationDetails = ({ riskData }: { riskData: any }) => {
     },
     {
       label: "Pricing Offered",
-      value: `${riskData?.riskParticipationTransaction?.pricingOffered} Per Annum`,
+      value: `${riskData?.riskParticipationTransaction?.pricingOffered}% Per Annum`,
     },
     {
       label: "Participation Offered",
@@ -70,7 +70,7 @@ const SharedRiskParticipationDetails = ({ riskData }: { riskData: any }) => {
       value: riskData.transhipment ? "Yes" : "No",
     },
     {
-      label: "Purpose",
+      label: "Product Description",
       value: riskData.productDescription,
     },
   ];
@@ -115,7 +115,7 @@ const SharedRiskParticipationDetails = ({ riskData }: { riskData: any }) => {
           />
         ))}
       </div>
-      <div className="px-4">
+      <div className="px-4 pb-3">
         {riskDetails2.map((field, index) => (
           <LcLgInfo
             key={index}

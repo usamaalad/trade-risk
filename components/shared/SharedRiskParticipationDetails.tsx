@@ -144,11 +144,15 @@ const SharedRiskParticipationDetails = ({ riskData }: { riskData: any }) => {
             noBorder={index === exporterInfo.length - 1}
           />
         ))}
+        {riskData?.signedCopy?.length > 0 &&
+          riskData.signedCopy.map((signedCopy: any, index: number) => (
+            <ViewFileAttachment key={index} attachment={signedCopy} />
+          ))}
+        {riskData?.attachment?.length > 0 &&
+          riskData.attachment.map((attachment: any, index: number) => (
+            <ViewFileAttachment key={index} attachment={attachment} />
+          ))}
       </div>
-      {riskData?.attachment?.length > 0 &&
-        riskData.attachment.map((attachment: any, index: number) => (
-          <ViewFileAttachment key={index} attachment={attachment} />
-        ))}
     </div>
   );
 };

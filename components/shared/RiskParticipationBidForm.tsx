@@ -1,12 +1,12 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addBid } from "@/services/apis/bids.api";
+import { addBid, addRiskBid } from "@/services/apis/bids.api";
 import { toast } from "sonner";
 import { ChangeEvent, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "../helpers";
-import { addBidTypes } from "@/validation/bids.validation";
+import { addBidTypes, getRiskAddBidTypes } from "@/validation/bids.validation";
 import { useAuth } from "@/context/AuthProvider";
 import { cn } from "@/lib/utils";
 import { formatFirstLetterOfWord } from "../LG-Output/helper";
@@ -25,10 +25,10 @@ export const RiskParticipationBidForm = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { mutateAsync } = useMutation({
-    mutationFn: addBid,
+    mutationFn: addRiskBid,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bid-status"] });
-      queryClient.invalidateQueries({ queryKey: ["fetch-lcs"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-risks"] });
       queryClient.invalidateQueries({ queryKey: ["single-lc"] });
       onSubmitSuccess();
     },
@@ -40,17 +40,20 @@ export const RiskParticipationBidForm = ({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: yupResolver(addBidTypes),
+    resolver: yupResolver(getRiskAddBidTypes(isCounterOffer, riskData)),
   });
 
-  const onSubmit: SubmitHandler<typeof addBidTypes> = async (data) => {
-    const baseData = {
-      confirmationPrice: data.confirmationPrice,
-      lc: riskData?._id,
-      type: riskData?.type!,
-      validity: data.validity,
-    };
+  const onSubmit: SubmitHandler<any> = async (data) => {
+    const confirmationPrice = isCounterOffer
+      ? data.confirmationPrice
+      : riskData?.riskParticipationTransaction?.pricingOffered;
 
+    const baseData = {
+      price: confirmationPrice,
+      risk: riskData?._id,
+      isCounterOffer: isCounterOffer,
+      bidValidity: data.bidValidity,
+    };
     const { success, response } = await mutateAsync(baseData);
 
     if (!success) return toast.error(response);
@@ -67,27 +70,28 @@ export const RiskParticipationBidForm = ({
     >
       <div>
         <label
-          htmlFor="validity"
+          htmlFor="bidValidity"
           className="text-[16px] block font-semibold mb-2"
         >
           Bid Validity
         </label>
         <DatePicker
           setValue={setValue}
+          name="bidValidity"
           key={riskData?._id}
           disabled={{
             before:
-              riskData?.period?.startDate &&
-              new Date(riskData.period.startDate) > new Date()
+              riskData?.lcPeriod?.date &&
+              new Date(riskData?.lcPeriod?.date) > new Date()
                 ? new Date(riskData.period.startDate)
                 : new Date(),
-            after: new Date(riskData?.period?.endDate),
+            after: new Date(riskData?.lcPeriod?.lcExpiry),
           }}
           isPast={false}
         />
-        {errors.validity && (
+        {errors.bidValidity && (
           <span className="text-red-500 text-[12px]">
-            {errors.validity.message}
+            {errors.bidValidity.message}
           </span>
         )}
       </div>
@@ -172,6 +176,7 @@ export const RiskParticipationBidForm = ({
             type="button"
             variant="ghost"
             size="lg"
+            onClick={() => setCounterOffer(false)}
             className="bg-borderCol hover:bg-borderCol/90 text-para w-full"
           >
             Cancel

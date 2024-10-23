@@ -10,15 +10,14 @@ import { useEffect, useState } from "react";
 import { IBids, ILcs } from "@/types/type";
 import { useAuth } from "@/context/AuthProvider";
 import { convertDateAndTimeToStringGMT } from "@/utils/helper/dateAndTimeGMT";
-import { BidCard } from "./TableDialog";
-import { BidForm } from "./LCBidForm";
-import { getLgBondTotal } from "../LG-Output/helper";
 import {
   convertDateAndTimeToStringGMTNoTsx,
   formatAmount,
 } from "../../utils/helper/helper";
 import SharedRiskParticipationDetails from "./SharedRiskParticipationDetails";
 import { RiskParticipationBidForm } from "./RiskParticipationBidForm";
+import { RiskParticipationBidCard } from "./RiskParticipationBidCard";
+import { formatFirstLetterOfWord } from "../LG-Output/helper";
 
 export const getStatusStyles = (status: string) => {
   switch (status) {
@@ -81,7 +80,7 @@ export const RiskParticipationAddBid = ({
   useEffect(() => {
     const userBids =
       riskData?.bids
-        ?.filter((bid: any) => bid.createdBy === user?._id)
+        ?.filter((bid: any) => bid.user === user?._id)
         .sort(
           (a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -94,7 +93,7 @@ export const RiskParticipationAddBid = ({
     }
 
     const anotherBankBidAccepted = riskData?.bids?.some(
-      (bid: any) => bid.status === "Accepted" && bid.createdBy !== user?._id
+      (bid: any) => bid.status === "Accepted" && bid.user !== user?._id
     );
 
     if (mostRecentBid && anotherBankBidAccepted) {
@@ -182,6 +181,13 @@ export const RiskParticipationAddBid = ({
                       riskData?.riskParticipationTransaction.participationValue
                     )}
                   </h2>
+                  <h2 className="text-lg font-medium text-[#515151] mb-1">
+                    <span className="text-para font-normal">
+                      LC Issuing Bank:
+                    </span>{" "}
+                    {formatFirstLetterOfWord(riskData?.issuingBank.bank)},{" "}
+                    {formatFirstLetterOfWord(riskData?.issuingBank.country)}
+                  </h2>
                   <p className="font-roboto text-sm text-para">
                     Created at,{" "}
                     {riskData &&
@@ -190,8 +196,7 @@ export const RiskParticipationAddBid = ({
                       })}
                     , by{" "}
                     <span className="capitalize text-text">
-                      {(riskData && riskData.exporterInfo?.beneficiaryName) ||
-                        riskData?.createdBy?.name}
+                      {riskData && riskData.exporterInfo?.name}
                     </span>
                   </p>
                   <div className="h-[2px] w-full bg-neutral-800 mt-5" />
@@ -218,10 +223,10 @@ export const RiskParticipationAddBid = ({
                   <>
                     {userBids && userBids.length > 0 ? (
                       userBids.map((bid: IBids, index: number) => (
-                        <BidCard
+                        <RiskParticipationBidCard
                           data={bid}
                           key={bid._id}
-                          isBank
+                          riskOwner={riskData.user}
                           setShowPreview={setShowPreview}
                         />
                       ))

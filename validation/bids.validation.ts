@@ -15,3 +15,31 @@ export const addBidTypes = Yup.object().shape({
       }
     ),
 });
+
+export const getRiskAddBidTypes = (isCounterOffer: boolean, riskData: any) => {
+  return Yup.object().shape({
+    bidValidity: Yup.date().required("Validity date is required"),
+    confirmationPrice: Yup.string().test(
+      "is-valid-confirmation-price",
+      "Confirmation price must be greater than 0 and less than or equal to 100",
+      (value, context) => {
+        if (isCounterOffer) {
+          if (!value)
+            return context.createError({
+              message: "Confirmation price is required",
+            });
+          const numericValue = parseFloat(value);
+          return numericValue > 0 && numericValue <= 100;
+        }
+        const offeredPrice =
+          riskData?.riskParticipationTransaction?.pricingOffered;
+        if (!offeredPrice || offeredPrice <= 0 || offeredPrice > 100) {
+          return context.createError({
+            message: "Confirmation price must be within the valid range",
+          });
+        }
+        return true;
+      }
+    ),
+  });
+};

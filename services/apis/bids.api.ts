@@ -14,14 +14,13 @@ export const fetchSingleBid = async (id: string) => {
 export const acceptOrRejectBid = async ({
   status,
   id,
-  key,
 }: {
   status: string;
   id: string;
   key: string;
 }) => {
   try {
-    const { data } = await api.put(`/bids?status=${status}&key=${key}`, {
+    const { data } = await api.put(`/bids?status=${status}`, {
       id,
     });
     console.log(data, "status update");

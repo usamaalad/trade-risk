@@ -45,7 +45,7 @@ export const CheckBoxInput = ({
   checked?: boolean; // Accept checked prop
 }) => {
   return (
-    <div className="my-2 flex items-center space-x-2 font-roboto w-full">
+    <div className="my-2 flex items-center space-x-2 font-roboto w-full h-full justify-center">
       <input
         type="checkbox"
         id={id}

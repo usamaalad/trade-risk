@@ -50,7 +50,7 @@ export const RiskStep1 = ({ register, watch, setValue }: Props) => {
               : "border border-borderCol bg-white"
           } rounded-md flex items-center justify-between gap-x-3 mb-2 text-lightGray text-sm w-full`}
         >
-          <div className="flex items-center gap-x-3 w-full">
+          <div className="flex items-center gap-x-3 w-full py-4">
             <input
               type="radio"
               id="outright-sales"
@@ -62,31 +62,6 @@ export const RiskStep1 = ({ register, watch, setValue }: Props) => {
               className="accent-[#255EF2] size-4"
             />
             Outright sales
-          </div>
-          <div className="bg-[#F2F2F2] py-1.5 w-fit h-full">
-            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  disabled
-                  variant={"outline"}
-                  className="w-fit justify-start text-left font-normal border-none text-[#B5B5BE] hover:bg-transparent text-sm bg-transparent"
-                  id="period-expiry-date"
-                >
-                  {date ? format(date, "PPP") : <span>DD/MM/YYYY</span>}
-                  <CalendarIcon className="ml-2 mr-2 size-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <ValidatingCalendar
-                  initialDate={date}
-                  onChange={(date) => {
-                    setDate(date);
-                    // setValue("lcPeriod.endDate", date);
-                  }}
-                  onClose={() => setIsPopoverOpen(false)}
-                />
-              </PopoverContent>
-            </Popover>
           </div>
         </label>
       </div>

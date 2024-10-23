@@ -158,7 +158,7 @@ export const BidPreviewWithinCountry: React.FC<BidPreviewProps> = ({
               {formData?.issueLg?.branchName || "-"}
             </span>
           </p>
-          {formData?.issueLg.city && (
+          {formData?.issueLg?.city && (
             <p className="text-[#5f5f5f]">
               City -{" "}
               <span className="text-[#5625f1] font-medium">
@@ -182,7 +182,7 @@ export const BidPreviewWithinCountry: React.FC<BidPreviewProps> = ({
               {formData?.collectLg?.branchName || "-"}
             </span>
           </p>
-          {formData?.collectLg.city && (
+          {formData?.collectLg?.city && (
             <p className="text-[#5f5f5f]">
               City -{" "}
               <span className="text-[#5625f1] font-medium">

@@ -27,201 +27,7 @@ import SharedLCDetails from "./SharedLCDetails";
 import { getStatusStyles } from "./AddBid";
 import { fetchSingleLc } from "@/services/apis/lcs.api";
 import SharedRiskParticipationDetails from "./SharedRiskParticipationDetails";
-
-export const BidCard = ({
-  data,
-  isBank,
-  setShowPreview,
-}: {
-  data: IBids;
-  isBank?: boolean;
-  setShowPreview?: (value: boolean) => void;
-}) => {
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: acceptOrRejectBid,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bid-status"] });
-      // queryClient.invalidateQueries({
-      //   queryKey: ["bid-status"],
-      // });
-    },
-  });
-
-  // Function to check if the bid has expired
-  const isExpired = new Date(data.bidValidity) < new Date();
-
-  const handleSubmit = async (status: string, id: string) => {
-    const { success, response } = await mutateAsync({
-      status,
-      id,
-      key: "lc",
-    });
-    if (!success) return toast.error(response as string);
-    else {
-      let closeBtn = document.getElementById("close-button");
-      // @ts-ignore
-      closeBtn.click();
-      toast.success(`Bid ${status}`);
-    }
-  };
-
-  return (
-    <div
-      className={`rounded-lg border border-borderCol px-3 py-5 ${
-        isExpired ? "opacity-60" : ""
-      }`}
-    >
-      <div className="grid grid-cols-2 gap-y-4">
-        <div>
-          <p className="mb-1 text-sm text-para">Bid Number</p>
-          <p className="text-lg font-semibold">
-            {formatNumberByAddingDigitsToStart(data.bidNumber)}
-          </p>
-        </div>
-        <div>
-          <p className="mb-1 text-sm capitalize text-para">Submitted by</p>
-          <p className="text-lg font-semibold capitalize">
-            {formatFirstLetterOfWord(data.bidBy?.name) || ""}
-          </p>
-        </div>
-        {data.bidType !== "LC Discounting" && (
-          <div>
-            <p className="mb-1 text-sm text-para">Confirmation Rate</p>
-            <p className="text-lg font-semibold text-text">
-              {data?.confirmationPrice}%{" "}
-              <span className="text-black">per annum</span>
-            </p>
-          </div>
-        )}
-        {(data?.discountBaseRate || data?.discountMargin) &&
-          data.bidType === "LC Confirmation & Discounting" && (
-            <div>
-              <p className="mb-1 text-sm text-para">Discount Pricing</p>
-              <p className="text-lg font-semibold">
-                {`${data?.discountBaseRate?.toUpperCase() || "-"} + `}
-                <span className="text-text">{`${
-                  data?.discountMargin ?? "-"
-                }%`}</span>
-              </p>
-            </div>
-          )}
-        {(data?.discountBaseRate || data?.discountMargin) &&
-          data.bidType === "LC Discounting" && (
-            <div>
-              <p className="mb-1 text-sm text-para">Discount Rate</p>
-              <p className="text-lg font-semibold">
-                {`${data?.discountBaseRate?.toUpperCase() || "-"} + `}
-                <span className="text-text">{`${
-                  data?.discountMargin ?? "-"
-                }%`}</span>
-              </p>
-            </div>
-          )}
-        <div>
-          <p className="mb-1 text-sm text-para ">Country</p>
-          <p className="text-lg font-semibold capitalize">
-            {data.bidBy.country}
-          </p>
-        </div>
-        {user.type === "corporate" && (
-          <div>
-            <p className="mb-1 text-sm text-para">Bid Submitted</p>
-            <p className="text-lg font-semibold">
-              {convertDateAndTimeToStringGMT({
-                date: data.createdAt,
-                sameLine: false,
-              })}
-            </p>
-          </div>
-        )}
-        <div>
-          <p className="mb-1 text-sm text-para">Bid Expiry</p>
-          <p className="text-lg font-semibold">
-            {convertDateAndTimeToStringGMT({
-              date: data.bidValidity,
-              sameLine: false,
-            })}
-          </p>
-        </div>
-        {data.bidType === "LC Discounting" && (
-          <div>
-            <p className="mb-1 text-sm text-para">Term</p>
-            <p className="text-lg font-semibold text-text">
-              <span className="text-black">
-                {data.perAnnum ? "Per Annum" : "Flat"}
-              </span>
-            </p>
-          </div>
-        )}
-
-        {data.status === "Pending" && !isBank && (
-          <>
-            {isExpired ? (
-              // Show Bid Expired div if the bid is expired
-              <div className="col-span-2 mt-2 flex justify-center items-center bg-black text-white rounded-lg py-2">
-                Bid Expired
-              </div>
-            ) : (
-              // Show Accept and Reject buttons if the bid is not expired
-              <div className="col-span-2 mt-2 flex gap-4">
-                <Button
-                  size="lg"
-                  className="flex-1 bg-[#29C084] hover:bg-[#29C084]/90"
-                  onClick={() => handleSubmit("Accepted", data._id)}
-                  disabled={isPending}
-                >
-                  Accept
-                </Button>
-                <Button
-                  size="lg"
-                  className="flex-1 bg-[#f4f7fa] text-para"
-                  variant="ghost"
-                  onClick={() => handleSubmit("Rejected", data._id)}
-                  disabled={isPending}
-                >
-                  Reject
-                </Button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {(data.status !== "Pending" ||
-        (data.status === "Pending" && data.createdBy === user?._id)) && (
-        <Button
-          className={`${
-            data.status === "Accepted"
-              ? "bg-[#29C08433] hover:bg-[#29C08433]"
-              : data.status === "Rejected"
-              ? "bg-[#FF02021A] hover:bg-[#FF02021A]"
-              : "bg-[#F4D0131A] hover:bg-[#F4D0131A]"
-          } mt-2 w-full cursor-default text-black`}
-        >
-          {data.status === "Accepted"
-            ? "Bid Accepted"
-            : data.status === "Rejected"
-            ? "Bid Rejected"
-            : data.status === "Pending"
-            ? `Bid Submitted on ${convertDateAndTimeToStringGMTNoTsx(
-                data.createdAt
-              )}`
-            : ""}
-        </Button>
-      )}
-      {data.status === "Rejected" && isBank && (
-        <Button
-          className="bg-[#5625F2] text-white hover:bg-[#5625F2] mt-5"
-          onClick={() => setShowPreview(false)}
-        >
-          Submit A New Bid
-        </Button>
-      )}
-    </div>
-  );
-};
+import { RiskParticipationBidCard } from "./RiskParticipationBidCard";
 
 export const RiskParticipationTableDialog = ({
   riskData: passedriskData,
@@ -322,6 +128,13 @@ export const RiskParticipationTableDialog = ({
                     riskData?.riskParticipationTransaction.participationValue
                   )}
                 </h2>
+                <h2 className="text-lg font-medium text-[#515151] mb-1">
+                  <span className="text-para font-normal">
+                    LC Issuing Bank:
+                  </span>{" "}
+                  {formatFirstLetterOfWord(riskData?.issuingBank.bank)},{" "}
+                  {formatFirstLetterOfWord(riskData?.issuingBank.country)}
+                </h2>
                 <p className="font-roboto text-sm text-para">
                   Created at,{" "}
                   {riskData &&
@@ -330,8 +143,7 @@ export const RiskParticipationTableDialog = ({
                     })}
                   , by{" "}
                   <span className="capitalize text-text">
-                    {(riskData && riskData.exporterInfo?.beneficiaryName) ||
-                      riskData?.createdBy?.name}
+                    {riskData && riskData.exporterInfo?.name}
                   </span>
                 </p>
                 <div className="h-[2px] w-full bg-neutral-800 mt-5" />
@@ -353,13 +165,21 @@ export const RiskParticipationTableDialog = ({
             <div className="mt-5 flex max-h-[90vh] flex-col gap-y-4 overflow-y-auto overflow-x-hidden pb-5">
               {myBidsPage
                 ? matchedBids?.map((bid) => (
-                    <BidCard data={bid} key={bid._id} isBank={false} />
+                    <RiskParticipationBidCard
+                      data={bid}
+                      key={bid._id}
+                      riskOwner={riskData.user}
+                    />
                   ))
                 : riskData &&
                   riskData.bids &&
                   riskData.bids.length > 0 &&
                   sortedBids(riskData.bids).map((data: IBids) => (
-                    <BidCard data={data} key={data._id} isBank={false} />
+                    <RiskParticipationBidCard
+                      data={data}
+                      riskOwner={riskData.user}
+                      key={data._id}
+                    />
                   ))}
             </div>
           </div>

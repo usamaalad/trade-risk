@@ -38,6 +38,14 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
     false
   );
   const pricingOffered = watch("riskParticipationTransaction.pricing");
+  const [pricingOfferedValue, setPricingOfferedValue] = useState<number>(
+    parseFloat(pricingOffered) || 0
+  );
+
+  // Sync state with watch value on component load or pricingOffered change
+  useEffect(() => {
+    setPricingOfferedValue(parseFloat(pricingOffered) || 0);
+  }, [pricingOffered]);
 
   const handleChange = (e: any) => {
     const { value } = e.target;
@@ -74,21 +82,20 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
     }
   };
 
-  // Percentage handling
   const handleIncrement = () => {
-    const currentValue = pricingOffered || "0";
-    const newValue = (parseFloat(currentValue) + 0.5).toFixed(1);
-    if (Number(newValue) > 100) {
-      return;
+    const newValue = (pricingOfferedValue + 0.5).toFixed(1);
+    if (parseFloat(newValue) <= 100) {
+      setPricingOfferedValue(parseFloat(newValue));
+      setValue("riskParticipationTransaction.pricingOffered", newValue);
     }
-    setValue("riskParticipationTransaction.pricingOffered", newValue);
   };
 
   const handleDecrement = () => {
-    let newValue = parseFloat(pricingOffered) - 0.5;
-    if (newValue < 0) newValue = 0;
-    newValue = newValue.toFixed(1);
-    setValue("riskParticipationTransaction.pricingOffered", newValue);
+    const newValue = (pricingOfferedValue - 0.5).toFixed(1);
+    if (parseFloat(newValue) >= 0) {
+      setPricingOfferedValue(parseFloat(newValue));
+      setValue("riskParticipationTransaction.pricingOffered", newValue);
+    }
   };
 
   useEffect(() => {
@@ -99,8 +106,10 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
         "riskParticipationTransaction.participationValue",
         calculatedValue
       );
+    } else {
+      setValue("riskParticipationTransaction.participationValue", "");
     }
-  }, [rawValue, percentageValue]);
+  }, [rawValue, percentageValue, setValue]);
 
   const handlePercentageFocus = () => {
     if (percentageValue.endsWith("%")) {
@@ -225,6 +234,10 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                   <Select
                     onValueChange={(value) => {
                       setValue("riskParticipationTransaction.currency", value);
+                      setValue(
+                        "riskParticipationTransaction.participationCurrency",
+                        value
+                      );
                     }}
                   >
                     <SelectTrigger className="w-[80px] py-[26px] bg-borderCol/80 focus:ring-0 focus:ring-offset-0 text-sm">
@@ -291,7 +304,9 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     type="text"
                     readOnly
                     value={
-                      watch("riskParticipationTransaction.currency") || "USD"
+                      watch(
+                        "riskParticipationTransaction.participationCurrency"
+                      ) || "USD"
                     }
                     className="py-[26px] border border-borderCol flex h-10 w-[25%] rounded-md bg-background px-3 text-sm bg-[#E9E9F0]"
                   />
@@ -299,7 +314,9 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                     type="text"
                     readOnly
                     value={formatAmount(
-                      watch("riskParticipationTransaction.participationValue")
+                      watch(
+                        "riskParticipationTransaction.participationValue"
+                      ) || ""
                     )}
                     className="py-[26px] border border-borderCol flex h-10 w-full rounded-md bg-background px-3 text-sm bg-[#E9E9F0]"
                   />
@@ -330,7 +347,7 @@ export const RiskStep2 = ({ register, watch, setValue }: Props) => {
                   required
                   max={100}
                   {...register("riskParticipationTransaction.pricingOffered")}
-                  className="w-fit items-center justify-center border-none bg-transparent text-sm text-lightGray flex self-center text-center w-14"
+                  className="w-fit items-center justify-center border-none bg-transparent text-sm text-lightGray flex self-center text-center w-8"
                   onKeyUp={(event: any) => {
                     if (event.target?.value > 100) {
                       event.target.value = "100.0";

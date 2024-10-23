@@ -32,7 +32,7 @@ const RiskParticipationPage = ({ searchParams }: Props) => {
     data,
   }: { data: ApiResponse<IRisk> | undefined; error: any; isLoading: boolean } =
     useQuery({
-      queryKey: ["fetch-risks", page, limit, search, filter],
+      queryKey: ["fetch-my-risks", page, limit, search, filter],
       queryFn: () =>
         fetchMyRisk({
           draft: false,

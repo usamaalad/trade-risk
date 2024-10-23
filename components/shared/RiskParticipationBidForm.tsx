@@ -28,8 +28,8 @@ export const RiskParticipationBidForm = ({
     mutationFn: addRiskBid,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bid-status"] });
-      queryClient.invalidateQueries({ queryKey: ["fetch-risks"] });
-      queryClient.invalidateQueries({ queryKey: ["single-lc"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-my-risks"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-other-risks"] });
       onSubmitSuccess();
     },
   });

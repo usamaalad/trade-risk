@@ -104,7 +104,7 @@ export const CashMarginBidCard = ({
           </div>
           <div>
             <p className="text-[#92929D] text-sm">Bid Expiry</p>
-            <p className="font-semibold text-xl">
+            <p className="font-semibold text-xl text-[#A10909]">
               {convertDateAndTimeToStringGMT({
                 date: bidDetail?.bidValidity,
                 sameLine: false,

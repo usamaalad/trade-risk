@@ -103,7 +103,13 @@ export const LcLgInfo = ({
           <FileSearch className="mr-2" color="#29C084" /> {value}
         </a>
       ) : (
-        <p className="max-w-[60%] text-right text-sm font-semibold capitalize">
+        <p
+          className={`max-w-[60%] text-right text-sm font-semibold capitalize ${
+            (label.includes("Expiry") ||
+              label.toLowerCase() === "last date for receiving bids") &&
+            "text-[#A10909]"
+          }`}
+        >
           {value || "-"}
         </p>
       )}

@@ -29,6 +29,9 @@ export const RiskParticipationBidCard = ({
     mutationFn: riskAcceptRejectBid,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bid-status"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-risks"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-my-risks"] });
+      queryClient.invalidateQueries({ queryKey: ["fetch-other-risks"] });
     },
   });
 
@@ -92,7 +95,7 @@ export const RiskParticipationBidCard = ({
         )}
         <div>
           <p className="mb-1 text-sm text-para">Bid Expiry</p>
-          <p className="text-lg font-semibold">
+          <p className="text-lg font-semibold text-[#A10909]">
             {convertDateAndTimeToStringGMT({
               date: data.bidValidity,
               sameLine: false,

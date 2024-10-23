@@ -355,28 +355,35 @@ const ConfirmationPage = () => {
           watch={watch}
         />
 
-        <div className="flex items-start gap-x-4 h-full w-full relative">
-          <Step6
-            watch={watch}
-            register={register}
-            title="Confirmation Info"
-            setValue={setValue}
-            setStepCompleted={handleStepCompletion}
-          />
-          <Step7Disounting
-            watch={watch}
-            getValues={getValues}
-            setValue={setValue}
-            register={register}
-          />
+        <div className="grid grid-cols-2 gap-4 h-full w-full relative">
+          {/* First Column: Step 6 and Step 7 */}
+          <div className="flex flex-col gap-4">
+            <Step6
+              watch={watch}
+              register={register}
+              title="Confirmation Info"
+              setValue={setValue}
+              setStepCompleted={handleStepCompletion}
+            />
+            <Step7
+              register={register}
+              setValue={setValue}
+              step={8}
+              setStepCompleted={handleStepCompletion}
+              watch={watch}
+            />
+          </div>
+
+          {/* Second Column: Step 7 Discounting */}
+          <div className="flex flex-col">
+            <Step7Disounting
+              watch={watch}
+              getValues={getValues}
+              setValue={setValue}
+              register={register}
+            />
+          </div>
         </div>
-        <Step7
-          register={register}
-          setValue={setValue}
-          step={8}
-          setStepCompleted={handleStepCompletion}
-          watch={watch}
-        />
         <LgStep12
           register={register}
           setValue={setValue}
